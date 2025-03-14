@@ -6,6 +6,9 @@ export const Proxy = async (req, res) => {
     console.log("Requesting:", urlPath);
 
     const response = await mangaService.get(urlPath, {
+      headers: {
+        "User-Agent": req.headers["user-agent"] || "MangaGeek",
+      },
       params: req.query.title ? { title: req.query.title } : {},
     });
 
