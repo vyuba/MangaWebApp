@@ -132,25 +132,11 @@ app.all("/proxy", async (req, res) => {
     })
   ).data;
 
-  const manga = (await mangaService.get(`manga/${data.data[0].id}`)).data;
-  console.log({ manga: manga.data.attributes });
+  res.json({ data });
+
+  // const manga = (await mangaService.get(`manga/${data.data[0].id}`)).data;
+  // console.log({ manga: manga.data.attributes });
 });
-
-//   not working code for testing;
-
-// app.get("/Image-proxy", async (req, res) => {
-//   const imagePath = decodeURIComponent(req.query.url);
-//   const mangaImage = await axios.get(
-//     `https://uploads.mangadex.org/covers/${imagePath}`,
-//     {
-//       responseType: "stream",
-//     }
-//   );
-
-//   res.setHeader("Content-Type", mangaImage.headers["content-type"]);
-//   mangaImage.data.pipe(res);
-//   res.status(200).json({ mangaImage });
-// });
 
 //   working code for all proxy;
 
@@ -249,6 +235,6 @@ app.get("/chap-image-proxy", async (req, res) => {
   }
 });
 
-// app.listen(PORT, () => console.log(`app running on port ${PORT}`));
+app.listen(PORT, () => console.log(`app running on port ${PORT}`));
 
-export default app;
+//export default app;
