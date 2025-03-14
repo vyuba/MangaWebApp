@@ -1,114 +1,116 @@
 import axios from "axios";
-import qs from "qs";
+// import qs from "qs";
 import "dotenv/config";
 import express, { response } from "express";
 import cors from "cors";
 
-let accessToken = null;
-let refreshToken = null;
+import { Proxy } from "./src/controller/proxy.js";
 
-const getAuth = async () => {
-  const credentials = qs.stringify({
-    grant_type: process.env.GRANT_TYPE,
-    username: process.env.CLIENT_USERNAME,
-    password: process.env.CLIENT_PASSWORD,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-  });
+// let accessToken = null;
+// let refreshToken = null;
 
-  // console.log({ credentials });
+// const getAuth = async () => {
+//   const credentials = qs.stringify({
+//     grant_type: process.env.GRANT_TYPE,
+//     username: process.env.CLIENT_USERNAME,
+//     password: process.env.CLIENT_PASSWORD,
+//     client_id: process.env.CLIENT_ID,
+//     client_secret: process.env.CLIENT_SECRET,
+//   });
 
-  const response = await axios.post(
-    "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
-    credentials,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }
-  );
+//   // console.log({ credentials });
 
-  accessToken = response.data.access_token;
-  refreshToken = response.data.refresh_token;
+//   const response = await axios.post(
+//     "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
+//     credentials,
+//     {
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//     }
+//   );
 
-  //   console.log({ accessToken, refreshToken });
+//   accessToken = response.data.access_token;
+//   refreshToken = response.data.refresh_token;
 
-  //   console.log("Tokens fetched successfully");
-};
+//   //   console.log({ accessToken, refreshToken });
 
-export const mangaService = axios.create({
-  baseURL: "https://api.mangadex.org",
-  headers: {
-    "User-Agent": "MangaGeek",
-  },
-});
-``;
-mangaService.interceptors.request.use(
-  async (config) => {
-    if (accessToken) {
-      config.headers.common = { Authorization: `Bearer ${accessToken}` };
-      return config;
-    }
+//   //   console.log("Tokens fetched successfully");
+// };
 
-    await getAuth();
+// export const mangaService = axios.create({
+//   baseURL: "https://api.mangadex.org",
+//   headers: {
+//     "User-Agent": "MangaGeek",
+//   },
+// });
+// ``;
+// mangaService.interceptors.request.use(
+//   async (config) => {
+//     if (accessToken) {
+//       config.headers.common = { Authorization: `Bearer ${accessToken}` };
+//       return config;
+//     }
 
-    config.headers.common = {
-      Authorization: `Bearer ${accessToken}`,
-    };
+//     await getAuth();
 
-    return config;
-  },
-  (error) => {
-    Promise.reject(error.response || error.message);
-  }
-);
+//     config.headers.common = {
+//       Authorization: `Bearer ${accessToken}`,
+//     };
 
-mangaService.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    // console.log(JSON.stringify(error, null, 2));
-    const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+//     return config;
+//   },
+//   (error) => {
+//     Promise.reject(error.response || error.message);
+//   }
+// );
 
-      try {
-        const credentials = qs.stringify({
-          grant_type: "refresh_token",
-          refreshToken,
-          client_id: process.env.CLIENT_ID,
-          client_secret: process.env.CLIENT_SECRET,
-        });
+// mangaService.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     // console.log(JSON.stringify(error, null, 2));
+//     const originalRequest = error.config;
+//     if (error.response.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true;
 
-        const response = await axios.post(
-          "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
-          credentials,
-          {
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        );
+//       try {
+//         const credentials = qs.stringify({
+//           grant_type: "refresh_token",
+//           refreshToken,
+//           client_id: process.env.CLIENT_ID,
+//           client_secret: process.env.CLIENT_SECRET,
+//         });
 
-        accessToken = response.data.access_token;
-        refreshToken = response.data.refresh_token;
+//         const response = await axios.post(
+//           "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
+//           credentials,
+//           {
+//             headers: {
+//               "Content-Type": "application/x-www-form-urlencoded",
+//             },
+//           }
+//         );
 
-        mangaService.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${accessToken}`;
+//         accessToken = response.data.access_token;
+//         refreshToken = response.data.refresh_token;
 
-        console.log("Token refreshed Successfully");
-        return mangaService(originalRequest);
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
-        accessToken = null;
-        refreshToken = null;
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
-      }
-    }
-    return Promise.reject(error);
-  }
-);
+//         mangaService.defaults.headers.common[
+//           "Authorization"
+//         ] = `Bearer ${accessToken}`;
+
+//         console.log("Token refreshed Successfully");
+//         return mangaService(originalRequest);
+//       } catch (refreshError) {
+//         console.error("Token refresh failed:", refreshError);
+//         accessToken = null;
+//         refreshToken = null;
+//         window.location.href = "/login";
+//         return Promise.reject(refreshError);
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 const PORT = 5000;
 
@@ -122,21 +124,7 @@ app.get("/", (req, res) => {
 
 //   working code for all proxy;
 
-app.all("/proxy", async (req, res) => {
-  const urlPath = decodeURIComponent(req.query.url);
-  console.log(req.query);
-
-  const data = (
-    await mangaService.get(`${urlPath}`, {
-      params: { title: req.params.title },
-    })
-  ).data;
-
-  res.json({ data });
-
-  // const manga = (await mangaService.get(`manga/${data.data[0].id}`)).data;
-  // console.log({ manga: manga.data.attributes });
-});
+app.all("/proxy", Proxy);
 
 //   working code for all proxy;
 
@@ -235,6 +223,6 @@ app.get("/chap-image-proxy", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`app running on port ${PORT}`));
+// app.listen(PORT, () => console.log(`app running on port ${PORT}`));
 
-//export default app;
+export default app;
