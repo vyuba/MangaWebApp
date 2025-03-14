@@ -6,7 +6,8 @@ let refreshToken = null;
 
 const getAuth = async () => {
   const credentials = qs.stringify({
-    grant_type: process.env.GRANT_TYPE,
+    grant_type: "password",
+    // grant_type: process.env.GRANT_TYPE,
     username: process.env.CLIENT_USERNAME,
     password: process.env.CLIENT_PASSWORD,
     client_id: process.env.CLIENT_ID,
