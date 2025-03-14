@@ -42,7 +42,7 @@ export const mangaService = axios.create({
     "User-Agent": "MangaGeek",
   },
 });
-
+``;
 mangaService.interceptors.request.use(
   async (config) => {
     if (accessToken) {
@@ -249,4 +249,6 @@ app.get("/", (req, res) => {
 //   }
 // });
 
-app.listen(PORT, () => console.log(`app running on port ${PORT}`));
+// app.listen(PORT, () => console.log(`app running on port ${PORT}`));
+
+export default app;
