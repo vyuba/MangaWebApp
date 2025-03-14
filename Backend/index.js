@@ -116,9 +116,9 @@ const app = express();
 
 app.use(cors());
 
-// app.get("/", (req, res) => {
-//   res.json({ name: "preye" });
-// });
+app.get("/", (req, res) => {
+  res.json({ name: "connected" });
+});
 
 app.all("/proxy", async (req, res) => {
   const urlPath = decodeURIComponent(req.query.url);
