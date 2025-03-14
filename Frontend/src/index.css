@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-family: "DM Sans", 'inter';
+  font-family: var(--font-family);
+  --primary-color: #03040B;    /* Primary brand color */
+  --secondary-color: #090A15; /* Secondary brand color */
+  --accent-color: #1E2380;     /* Accent or highlight color */
+  --background-color: #03040B; /* Background */
+  --text-color: #C7C6DC;       /* Primary text */
+  --border-color: #101228;     /* Borders */
+  --error-bg-color: #561010;      /* Error or danger */
+  --error-border-color: #B50000;      /* Error or danger */
+  --error-info-color: #D1A1A1;       /* Informational messages */
+  --success-bg-color: #083A0C;    /* Success */
+  --success-border-color: #0F8717;    /* Success */
+  --success-info-color: #C3E3C5;       /* Informational messages */
+  --warning-color: #facc15;    /* Warning */
+  /* --text-muted: #6b7280;       Muted text */
+}
+
+.searchLoader{
+  animation: gradientAnimation 6s ease infinite;
+  background: linear-gradient(90deg, #101228, #181b3d, #383f8e);
+  background-size: 300% 300%;
+}
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
