@@ -120,30 +120,23 @@ app.get("/", (req, res) => {
   res.json({ name: "connected" });
 });
 
-app.all("/proxy", async (req, res) => {
-  const urlPath = decodeURIComponent(req.query.url);
-  console.log(req.query);
+//   working code for all proxy;
 
-  const data = (
-    await mangaService.get(`${urlPath}`, {
-      params: { title: req.params.title },
-    })
-  ).data;
+// app.all("/proxy", async (req, res) => {
+//   const urlPath = decodeURIComponent(req.query.url);
+//   console.log(req.query);
 
-  const manga = (await mangaService.get(`manga/${data.data[0].id}`)).data;
-  console.log({ manga: manga.data.attributes });
+//   const data = (
+//     await mangaService.get(`${urlPath}`, {
+//       params: { title: req.params.title },
+//     })
+//   ).data;
 
-  // const mangas = await axios.get(
-  //   "https://api.mangadex.org/manga/6676aef9-cf30-4950-9a20-e0382b5e7447",
-  //   res.setHeader("Content-Type", mangas.headers["content-type"]),
-  //   "https://uploads.mangadex.org/covers/e79405c8-0936-4f17-9035-8ced2307ba5f/9e641e85-b741-486a-a221-85d1a0e9e8d6.png",
-  //   { responseType: "stream" }
-  // );
+//   const manga = (await mangaService.get(`manga/${data.data[0].id}`)).data;
+//   console.log({ manga: manga.data.attributes });
+// });
 
-  // res.setHeader("Content-Type", mangas.headers["content-type"]);
-  // mangas.data.pipe(res);
-  // res.status(200).json({ mangas });
-});
+//   not working code for testing;
 
 // app.get("/Image-proxy", async (req, res) => {
 //   const imagePath = decodeURIComponent(req.query.url);
@@ -159,112 +152,101 @@ app.all("/proxy", async (req, res) => {
 //   res.status(200).json({ mangaImage });
 // });
 
-app.get("/image-proxy", async (req, res) => {
-  try {
-    const imagePath = decodeURIComponent(req.query.url);
-    console.log(`https://uploads.mangadex.org/covers/${imagePath}`);
-    const mangaImage = await axios.get(
-      `https://uploads.mangadex.org/covers/${imagePath}`,
-      { responseType: "stream" }
-    );
+//   working code for all proxy;
 
-    // Set content type and pipe the image data
-    res.setHeader("Content-Type", mangaImage.headers["content-type"]);
-    mangaImage.data.pipe(res);
-  } catch (error) {
-    console.log({ imageProxyError: error });
+// app.get("/image-proxy", async (req, res) => {
+//   try {
+//     const imagePath = decodeURIComponent(req.query.url);
+//     console.log(`https://uploads.mangadex.org/covers/${imagePath}`);
+//     const mangaImage = await axios.get(
+//       `https://uploads.mangadex.org/covers/${imagePath}`,
+//       { responseType: "stream" }
+//     );
 
-    // console.error("Error fetching manga image:", error);
-    res.status(500).json({ error: "Failed to fetch manga image." });
-  }
-});
+//     // Set content type and pipe the image data
+//     res.setHeader("Content-Type", mangaImage.headers["content-type"]);
+//     mangaImage.data.pipe(res);
+//   } catch (error) {
+//     console.log({ imageProxyError: error });
 
-app.get("/chap-image-proxy", async (req, res) => {
-  const startTime = performance.now();
-  let totalBytes = 0;
-  let success = false;
-  try {
-    const imagePath = decodeURIComponent(req.query.url);
-    const imageUrl = `https://uploads.mangadex.org/${imagePath}`; // Added this line
-    console.log(imageUrl);
+//     // console.error("Error fetching manga image:", error);
+//     res.status(500).json({ error: "Failed to fetch manga image." });
+//   }
+// });
 
-    const mangaImage = await axios.get(imageUrl, {
-      responseType: "stream",
-      onDownloadProgress: (progressEvent) => {
-        totalBytes = progressEvent.loaded;
-      },
-    });
+// app.get("/chap-image-proxy", async (req, res) => {
+//   const startTime = performance.now();
+//   let totalBytes = 0;
+//   let success = false;
+//   try {
+//     const imagePath = decodeURIComponent(req.query.url);
+//     const imageUrl = `https://uploads.mangadex.org/${imagePath}`; // Added this line
+//     console.log(imageUrl);
 
-    success = mangaImage.status >= 200 && mangaImage.status < 300; // Fixed variable name
+//     const mangaImage = await axios.get(imageUrl, {
+//       responseType: "stream",
+//       onDownloadProgress: (progressEvent) => {
+//         totalBytes = progressEvent.loaded;
+//       },
+//     });
 
-    const endTime = performance.now();
-    const duration = Math.round(endTime - startTime);
+//     success = mangaImage.status >= 200 && mangaImage.status < 300; // Fixed variable name
 
-    // Set content type and pipe the image data
-    res.setHeader("Content-Type", mangaImage.headers["content-type"]);
-    mangaImage.data.pipe(res);
+//     const endTime = performance.now();
+//     const duration = Math.round(endTime - startTime);
 
-    // Moved reporting outside of res.pipe to ensure it doesn't block
-    try {
-      await axios.post(
-        "https://api.mangadex.network/report",
-        {
-          url: imageUrl,
-          success: true,
-          bytes: totalBytes,
-          duration,
-          cached: false,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (reportError) {
-      console.error("MangaDex reporting error:", reportError);
-    }
-  } catch (error) {
-    console.log({ imageProxyError: error });
-    res.status(500).json({ error: "Failed to fetch manga image." });
+//     // Set content type and pipe the image data
+//     res.setHeader("Content-Type", mangaImage.headers["content-type"]);
+//     mangaImage.data.pipe(res);
 
-    // Report failure to MangaDex
-    try {
-      const endTime = performance.now();
-      const duration = Math.round(endTime - startTime);
+//     // Moved reporting outside of res.pipe to ensure it doesn't block
+//     try {
+//       await axios.post(
+//         "https://api.mangadex.network/report",
+//         {
+//           url: imageUrl,
+//           success: true,
+//           bytes: totalBytes,
+//           duration,
+//           cached: false,
+//         },
+//         {
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
+//     } catch (reportError) {
+//       console.error("MangaDex reporting error:", reportError);
+//     }
+//   } catch (error) {
+//     console.log({ imageProxyError: error });
+//     res.status(500).json({ error: "Failed to fetch manga image." });
 
-      await axios.post(
-        "https://api.mangadex.network/report",
-        {
-          url: imageUrl, // Make sure imageUrl is defined
-          success: false,
-          bytes: totalBytes,
-          duration,
-          cached: false,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (reportError) {
-      console.error("MangaDex failure reporting error:", reportError);
-    }
-  }
-});
+//     // Report failure to MangaDex
+//     try {
+//       const endTime = performance.now();
+//       const duration = Math.round(endTime - startTime);
+
+//       await axios.post(
+//         "https://api.mangadex.network/report",
+//         {
+//           url: imageUrl, // Make sure imageUrl is defined
+//           success: false,
+//           bytes: totalBytes,
+//           duration,
+//           cached: false,
+//         },
+//         {
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
+//     } catch (reportError) {
+//       console.error("MangaDex failure reporting error:", reportError);
+//     }
+//   }
+// });
 
 app.listen(PORT, () => console.log(`app running on port ${PORT}`));
-
-// import fs from "fs";
-//
-// const readableStream = fs.createReadStream("t.js", "UTF-8");
-// const writableStream = fs.createWriteStream("output.js");
-//
-// readableStream.on("data", (chunk) => {
-//   console.log(chunk);
-// });
-//
-// fs.createF
-//
-// readableStream.pipe(writableStream);
