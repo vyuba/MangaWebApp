@@ -1,8 +1,8 @@
 import axios from "axios";
 import qs from "qs";
 
-let accessToken = null;
-let refreshToken = null;
+let accessToken;
+let refreshToken;
 
 const getAuth = async () => {
   const credentials = qs.stringify({
