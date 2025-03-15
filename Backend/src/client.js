@@ -1,17 +1,24 @@
 import axios from "axios";
 import qs from "qs";
 
-let accessToken;
-let refreshToken;
+let accessToken = null;
+let refreshToken = null;
+
+("Psych1234_");
+CLIENT_USERNAME = "vyuba";
 
 const getAuth = async () => {
   const credentials = qs.stringify({
     grant_type: "password",
     // grant_type: process.env.GRANT_TYPE,
-    username: process.env.CLIENT_USERNAME,
-    password: process.env.CLIENT_PASSWORD,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
+    // username: process.env.CLIENT_USERNAME,
+    // password: process.env.CLIENT_PASSWORD,
+    // client_id: process.env.CLIENT_ID,
+    // client_secret: process.env.CLIENT_SECRET,
+    username: "vyuba",
+    password: "Psych1234_",
+    client_id: "personal-client-3f4b6be7-277c-47f7-844a-9edd906302c4-5c8cef11",
+    client_secret: "cAL6JulvPFFc91UQz5rJgCyRkGxyQKJE",
   });
 
   // console.log({ credentials });
