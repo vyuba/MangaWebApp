@@ -3,7 +3,7 @@ import { useManga } from "../contextApi/useManga";
 import PageRouteName from "../components/PageRouteName";
 import { useState } from "react";
 import { useAppContext } from "../AppProvider";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 function MangaPage() {
   const { id } = useParams();
   const { allMangaChapter, setAllMangaChapter } = useAppContext();
@@ -18,7 +18,7 @@ function MangaPage() {
   if (isLoadingManga) {
     return <div>manga details are fetching ...</div>;
   }
-  const imageUrl = `http://localhost:5000/image-proxy?url=${id}/${manga.coverFileName}`;
+  const imageUrl = `${apiUrl}/image-proxy?url=${id}/${manga.coverFileName}`;
   const mangaChapters = manga.mangaFeed.data.data.data;
   setAllMangaChapter(mangaChapters);
   console.log(allMangaChapter);

@@ -3,6 +3,7 @@ import { useChapter } from "../contextApi/useChapterImage";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAppContext } from "../AppProvider";
+const apiUrl = import.meta.env.VITE_API_URL;
 function ChapterPage() {
   const { chapterId, mangaId, mangaTitle } = useParams();
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ function ChapterPage() {
         {chapterData?.chapter.data.map((value, index) => (
           <img
             key={index}
-            src={`http://localhost:5000/chap-image-proxy?url=data/${hash}/${value}`}
+            src={`${apiUrl}/chap-image-proxy?url=data/${hash}/${value}`}
             alt=""
           />
         ))}
