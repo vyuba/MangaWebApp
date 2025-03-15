@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useMangaImage } from "../contextApi/useMangaImage";
 import { useManga } from "../contextApi/useManga";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function Card({ manga }) {
   const mangaTitle = manga.attributes.title.en;
@@ -15,7 +16,7 @@ function Card({ manga }) {
 
   const coverFileNAme = useMangaImage(mangaCoverId);
 
-  const imageSrc = `http://localhost:5000/image-proxy?url=${mangaId}/${coverFileNAme}`;
+  const imageSrc = `${apiUrl}/image-proxy?url=${mangaId}/${coverFileNAme}`;
   const forEachManga = useManga(mangaId);
 
   return (

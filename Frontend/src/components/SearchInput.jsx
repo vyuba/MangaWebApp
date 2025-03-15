@@ -4,6 +4,7 @@ import { useSearchManga } from "../contextApi/useSearchManga";
 import { Link } from "react-router";
 import { useMangaImage } from "../contextApi/useMangaImage";
 import { useState, useMemo } from "react";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function SearchInput() {
   const { search, setSearch } = useAppContext();
@@ -29,7 +30,7 @@ function SearchInput() {
       if (mangaCoverId) {
         setCoverArtId(mangaCoverId);
         setImageSrc(
-          `http://localhost:5000/image-proxy?url=${searchResult[0]?.id}/${coverFileName}`
+          `${apiUrl}/image-proxy?url=${searchResult[0]?.id}/${coverFileName}`
         );
       }
     }
