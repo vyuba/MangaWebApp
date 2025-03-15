@@ -4,9 +4,6 @@ import qs from "qs";
 let accessToken = null;
 let refreshToken = null;
 
-("Psych1234_");
-CLIENT_USERNAME = "vyuba";
-
 const getAuth = async () => {
   const credentials = qs.stringify({
     grant_type: "password",
