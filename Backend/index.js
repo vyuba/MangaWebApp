@@ -223,6 +223,6 @@ app.get("/chap-image-proxy", async (req, res) => {
   }
 });
 
-// app.listen(PORT, () => console.log(`app running on port ${PORT}`));
+app.listen(PORT, () => console.log(`app running on port ${PORT}`));
 
 export default app;

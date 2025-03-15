@@ -29,7 +29,7 @@ const getAuth = async () => {
   accessToken = response.data.access_token;
   refreshToken = response.data.refresh_token;
 
-  //   console.log({ accessToken, refreshToken });
+  console.log({ refreshToken });
 
   //   console.log("Tokens fetched successfully");
 };
@@ -40,7 +40,7 @@ export const mangaService = axios.create({
     "User-Agent": "MangaGeek",
   },
 });
-``;
+
 mangaService.interceptors.request.use(
   async (config) => {
     if (accessToken) {
@@ -72,7 +72,7 @@ mangaService.interceptors.response.use(
       try {
         const credentials = qs.stringify({
           grant_type: "refresh_token",
-          refreshToken,
+          refresh_token: refreshToken,
           // client_id: process.env.CLIENT_ID,
           // client_secret: process.env.CLIENT_SECRET,
           client_id:
