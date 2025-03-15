@@ -25,7 +25,7 @@ const chapImage = async (req, res) => {
   let totalBytes = 0;
   try {
     const imagePath = decodeURIComponent(req.query.url);
-    const imageUrl = `https://uploads.mangadex.org/${imagePath}`; // Added this line
+    const imageUrl = `${imagePath}`; // Added this line
     console.log(imageUrl);
 
     const mangaImage = await axios.get(imageUrl, {
