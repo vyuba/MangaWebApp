@@ -17,6 +17,7 @@ function Card({ manga }) {
   const coverFileNAme = useMangaImage(mangaCoverId);
 
   const imageSrc = `${apiUrl}/image-proxy?url=${mangaId}/${coverFileNAme}`;
+  console.log(imageSrc);
   const forEachManga = useManga(mangaId);
 
   return (
