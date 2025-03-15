@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 export const useMangaImage = (mangaCoverId) => {
   const [coverFileName, setCoverFileName] = useState();
 
@@ -8,7 +8,7 @@ export const useMangaImage = (mangaCoverId) => {
     const getMangaImage = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/proxy?url=/cover/${mangaCoverId}`
+          `${apiUrl}/proxy?url=/cover/${mangaCoverId}`
         );
 
         const fileName = response.data.data.data.attributes?.fileName;

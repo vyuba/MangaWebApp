@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useManga = (mangaId) => {
   const [managaFeed, setMangaFeed] = useState(null);
@@ -9,7 +10,7 @@ export const useManga = (mangaId) => {
     const fetchManga = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/proxy?url=/manga/${mangaId}/feed`
+          `${apiUrl}/proxy?url=/manga/${mangaId}/feed`
         );
         setMangaFeed(response);
         setIsLoadingManga(false);

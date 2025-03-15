@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useChapter = (chapterId) => {
   const [chapterData, setChapterData] = useState(null);
@@ -7,7 +8,7 @@ export const useChapter = (chapterId) => {
     const getChapterData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/proxy?url=/at-home/server/${chapterId}`
+          `${apiUrl}/proxy?url=/at-home/server/${chapterId}`
         );
         console.log(response);
         setChapterData(response.data.data);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useSearchManga = (title) => {
   const [isLoadingManga, setIsLoadingManga] = useState(false);
@@ -14,12 +14,9 @@ export const useSearchManga = (title) => {
       setIsLoadingManga(true);
       setIsErrorManga(false);
       try {
-        const response = await axios.get(
-          `http://localhost:5000/proxy?url=/manga`,
-          {
-            params: { title: title },
-          }
-        );
+        const response = await axios.get(`${apiUrl}/proxy?url=/manga`, {
+          params: { title: title },
+        });
         const resultSearch = response.data.data.data;
         setSearchResult(resultSearch);
         console.log(response);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const useManga = (mangaId) => {
   const [manga, setManga] = useState(null);
@@ -9,7 +10,7 @@ export const useManga = (mangaId) => {
     const fetchManga = async () => {
       try {
         const managaResonse = await axios.get(
-          `http://localhost:5000/proxy?url=/manga/${mangaId}`
+          `${apiUrl}/proxy?url=/manga/${mangaId}`
         );
 
         const mangaData = managaResonse.data.data.data;
@@ -19,13 +20,13 @@ export const useManga = (mangaId) => {
         ).id;
 
         const coverResponse = await axios.get(
-          `http://localhost:5000/proxy?url=/cover/${mangaCoverId}`
+          `${apiUrl}/proxy?url=/cover/${mangaCoverId}`
         );
 
         const coverFileName = coverResponse.data.data.data.attributes.fileName;
 
         const mangaDetailsResponse = await axios.get(
-          `http://localhost:5000/proxy?url=manga/${mangaId}/aggregate`
+          `${apiUrl}/proxy?url=manga/${mangaId}/aggregate`
           // {
           //   params: {
           //     translatedLanguage: "en",
@@ -40,7 +41,7 @@ export const useManga = (mangaId) => {
         ).id;
 
         const mangaAuthorResponse = await axios.get(
-          `http://localhost:5000/proxy?url=/author/${mangaAuthorId}`
+          `${apiUrl}/proxy?url=/author/${mangaAuthorId}`
         );
 
         const mangaAuthor = mangaAuthorResponse.data.data.data;
@@ -52,21 +53,18 @@ export const useManga = (mangaId) => {
         };
 
         const mangaFeed = await axios.get(
-          `http://localhost:5000/proxy?url=/manga/${mangaId}/feed`,
+          `${apiUrl}/proxy?url=/manga/${mangaId}/feed`,
           {
             params,
           }
         );
 
-        const mangaChapters = await axios.get(
-          `http://localhost:5000/proxy?url=/chapter`,
-          {
-            params: {
-              manga: mangaId,
-              translatedLanguage: ["en"],
-            },
-          }
-        );
+        const mangaChapters = await axios.get(`${apiUrl}/proxy?url=/chapter`, {
+          params: {
+            manga: mangaId,
+            translatedLanguage: ["en"],
+          },
+        });
 
         setManga({
           ...mangaData,
