@@ -3,7 +3,7 @@ import { useChapter } from "../contextApi/useChapterImage";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useAppContext } from "../AppProvider";
-const apiUrl = import.meta.env.VITE_API_URL;
+// const apiUrl = import.meta.env.VITE_API_URL;
 function ChapterPage() {
   const { chapterId, mangaId, mangaTitle } = useParams();
   const navigate = useNavigate();
@@ -11,6 +11,7 @@ function ChapterPage() {
   const chapterData = useChapter(chapterId);
   console.log(chapterData);
   const hash = chapterData?.chapter.hash;
+  const baseUrl = chapterData?.baseUrl;
   const initialChapter = allMangaChapter.find(
     (chapter) => chapter.id === chapterId
   );
@@ -73,10 +74,10 @@ function ChapterPage() {
         </div>
       </div>
       <div className="flex flex-col w-full max-w-[1200px] mx-auto">
-        {chapterData?.chapter.data.map((value, index) => (
+        {chapterData?.chapter.data.map((chap, index) => (
           <img
             key={index}
-            src={`${apiUrl}/chap-image-proxy?url=data/${hash}/${value}`}
+            src={`${baseUrl}/chap-image-proxy?url=data/${hash}/${chap}`}
             alt=""
           />
         ))}
