@@ -73,8 +73,11 @@ mangaService.interceptors.response.use(
         const credentials = qs.stringify({
           grant_type: "refresh_token",
           refreshToken,
-          client_id: process.env.CLIENT_ID,
-          client_secret: process.env.CLIENT_SECRET,
+          // client_id: process.env.CLIENT_ID,
+          // client_secret: process.env.CLIENT_SECRET,
+          client_id:
+            "personal-client-3f4b6be7-277c-47f7-844a-9edd906302c4-5c8cef11",
+          client_secret: "cAL6JulvPFFc91UQz5rJgCyRkGxyQKJE",
         });
 
         const response = await axios.post(
