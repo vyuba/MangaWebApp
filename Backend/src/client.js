@@ -77,7 +77,7 @@ mangaService.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const credentials = {
+        const credentials = qs.stringify({
           grant_type: "refresh_token",
           refresh_token: refreshToken,
           // client_id: process.env.CLIENT_ID,
@@ -85,7 +85,7 @@ mangaService.interceptors.response.use(
           client_id:
             "personal-client-3f4b6be7-277c-47f7-844a-9edd906302c4-5c8cef11",
           client_secret: "cAL6JulvPFFc91UQz5rJgCyRkGxyQKJE",
-        };
+        });
 
         const response = await axios.post(
           "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
