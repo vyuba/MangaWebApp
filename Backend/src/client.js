@@ -29,7 +29,7 @@ const getAuth = async () => {
   accessToken = response.data.access_token;
   refreshToken = response.data.refresh_token;
 
-  console.log({ refreshToken });
+  // console.log({ refreshToken });
 
   //   console.log("Tokens fetched successfully");
 };
@@ -97,7 +97,7 @@ mangaService.interceptors.response.use(
           "Authorization"
         ] = `Bearer ${accessToken}`;
 
-        console.log("Token refreshed Successfully");
+        // console.log("Token refreshed Successfully");
         return mangaService(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);

@@ -17,22 +17,23 @@ function App() {
 
   return (
     <>
-      <div className="bg-background text-text w-screen h-screen md:flex md:flex-row relative">
-        <div className="flex flex-row md:m-4 gap-2 transition-all">
-          <SideBar shrink={shrink} />
-          <button
-            onClick={handleSidebarShrink}
-            className="border-border  h-fit border bg-secondary p-2 z-30 hidden md:block"
+      <BrowserRouter>
+        <div className="bg-background text-text w-screen h-screen md:flex md:flex-row relative">
+          <div className="flex flex-row md:m-4 gap-2 transition-all">
+            <SideBar shrink={shrink} />
+            <button
+              onClick={handleSidebarShrink}
+              className="border-border  h-fit border bg-secondary p-2 z-30 hidden md:block"
+            >
+              <SidebarClose />
+            </button>
+          </div>
+          <div
+            id="content-container"
+            className="px-4 py-4 flex flex-col gap-5 w-full h-full overflow-y-auto"
           >
-            <SidebarClose />
-          </button>
-        </div>
-        <div
-          id="content-container"
-          className="px-4 py-4 flex flex-col gap-5 w-full h-full overflow-y-auto"
-        >
-          <Navbar />
-          <BrowserRouter>
+            <Navbar />
+            <div className="py-16 md:py-0 w-full  h-fit " />
             <Routes>
               <Route index element={<Dasboard />} />
               <Route path="/manga/:id" element={<MangaPage />} />
@@ -42,9 +43,9 @@ function App() {
                 element={<ChapterPage />}
               />
             </Routes>
-          </BrowserRouter>
+          </div>
         </div>
-      </div>
+      </BrowserRouter>
     </>
   );
 }

@@ -19,11 +19,11 @@ export const useSearchManga = (title) => {
         });
         const resultSearch = response.data.data.data;
         setSearchResult(resultSearch);
-        console.log(response);
+        // console.log(response);
         setIsLoadingManga(false);
       } catch (error) {
         setIsLoadingManga(false);
-        console.error("Error fetching manga:", error);
+        // console.error("Error fetching manga:", error);
         setSearchResult(null);
         setIsErrorManga(true);
       }

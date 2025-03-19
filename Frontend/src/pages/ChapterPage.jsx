@@ -6,6 +6,7 @@ import { useAppContext } from "../AppProvider";
 const apiUrl = import.meta.env.VITE_API_URL;
 function ChapterPage() {
   const { chapterId, mangaId, mangaTitle } = useParams();
+  const [isImageLoading, setImageIsLoading] = useState(true);
   const navigate = useNavigate();
   const { allMangaChapter, setAllMangaChapter } = useAppContext();
   const chapterData = useChapter(chapterId);
@@ -45,7 +46,7 @@ function ChapterPage() {
       <div className="w-full ">
         <button
           onClick={scrollToTop}
-          className="fixed text-text bottom-4 right-4 bg-secondary border border-border"
+          className="fixed text-text z-50 bottom-4 right-4 bg-secondary border border-border"
         >
           <LucideArrowBigUp size={"50px"} className="p-3" />
         </button>
@@ -73,14 +74,41 @@ function ChapterPage() {
           </select>
         </div>
       </div>
-      <div className="flex flex-col w-full max-w-[1200px] mx-auto">
+      <div className="flex flex-col w-full gap-2 max-w-[1200px] mx-auto">
         {chapterData?.chapter.data.map((jpg, index) => (
-          <img
-            key={index}
-            src={`${apiUrl}/chap-image-proxy?url=${baseUrl}/data/${hash}/${jpg}`}
-            alt=""
-          />
+          <div key={index} className="w-full h-full">
+            {/* Shimmer container (Visible only when loading) */}
+            {isImageLoading && (
+              <div className=" bg-[#090A15]  w-full h-[500px] flex items-center justify-center relative">
+                <p
+                  style={{
+                    fontSize: `clamp(18px, 20vw, 70px)`,
+                    WebkitTextStroke: `1px var(--border-color)`,
+                  }}
+                  className="font-bold text-background"
+                >
+                  {index}
+                </p>
+              </div>
+            )}
+
+            {/* Image (Hidden until loaded) */}
+            <img
+              onLoad={() => setImageIsLoading(false)}
+              src={`${apiUrl}/chap-image-proxy?url=${baseUrl}/data/${hash}/${jpg}`}
+              alt=""
+              className={`w-full h-full transition-all duration-500`}
+            />
+          </div>
         ))}
+      </div>
+      <div className="w-fulll h-full flex flex-row">
+        <button className="w-full py-20 h-full flex-[40%] border border-border bg-[#090A15] flex items-center justify-center capitalize text-lg">
+          prev
+        </button>
+        <button className="w-full py-20 h-full flex-[60%] border border-border bg-[#090A15] flex items-center justify-center capitalize text-lg">
+          next
+        </button>
       </div>
     </div>
   );

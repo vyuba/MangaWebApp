@@ -33,7 +33,7 @@ export const useManga = (mangaId) => {
           //   },
           // }
         );
-        console.log(mangaDetailsResponse);
+        // console.log(mangaDetailsResponse);
         const mangaDetails = mangaDetailsResponse.data.data;
 
         const mangaAuthorId = mangaData.relationships.find(

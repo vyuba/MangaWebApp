@@ -3,7 +3,7 @@ import axios from "axios";
 const ImageProxy = async (req, res) => {
   try {
     const imagePath = decodeURIComponent(req.query.url);
-    console.log(`https://uploads.mangadex.org/covers/${imagePath}`);
+    // console.log(`https://uploads.mangadex.org/covers/${imagePath}`);
     const mangaImage = await axios.get(
       `https://uploads.mangadex.org/covers/${imagePath}`,
       { responseType: "stream" }
@@ -13,7 +13,7 @@ const ImageProxy = async (req, res) => {
     res.setHeader("Content-Type", mangaImage.headers["content-type"]);
     mangaImage.data.pipe(res);
   } catch (error) {
-    console.log({ imageProxyError: error });
+    // console.log({ imageProxyError: error });
 
     // console.error("Error fetching manga image:", error);
     res.status(500).json({ error: "Failed to fetch manga image." });
@@ -27,7 +27,7 @@ const chapImage = async (req, res) => {
   try {
     const imagePath = decodeURIComponent(req.query.url);
     const imageUrl = `${imagePath}`; // Added this line
-    console.log(imageUrl);
+    // console.log(imageUrl);
 
     const mangaImage = await axios.get(imageUrl, {
       responseType: "stream",
@@ -66,7 +66,7 @@ const chapImage = async (req, res) => {
       console.error("MangaDex reporting error:", reportError);
     }
   } catch (error) {
-    console.log({ imageProxyError: error });
+    // console.log({ imageProxyError: error });
     res.status(500).json({ error: "Failed to fetch manga image." });
 
     // Report failure to MangaDex
