@@ -1,4 +1,5 @@
 import { LucideArrowBigUp } from "lucide-react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useChapter } from "../contextApi/useChapterImage";
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
@@ -37,6 +38,26 @@ function ChapterPage() {
       behavior: "smooth",
     });
   };
+
+  // const {
+  //   fetchNextPage,
+  //   fetchPreviousPage,
+  //   hasNextPage,
+  //   hasPreviousPage,
+  //   isFetchingNextPage,
+  //   isFetchingPreviousPage,
+  //   promise,
+  //   ...result
+  // } = useInfiniteQuery({
+  //   queryKey,
+  //   queryFn: ({ pageParam }) => fetchPage(pageParam),
+  //   initialPageParam: 1,
+  //   ...options,
+  //   getNextPageParam: (lastPage, allPages, lastPageParam, allMangaChapter) =>
+  //     lastPage.nextCursor,
+  //   getPreviousPageParam: (firstPage, allPages, firstPageParam, allMangaChapter) =>
+  //     firstPage.prevCursor,
+  // })
 
   return (
     <div className="chapter-container flex flex-col gap-4 relative h-full">

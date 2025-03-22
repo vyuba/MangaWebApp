@@ -1,10 +1,11 @@
 import { BookMarked, HistoryIcon, LucideHome } from "lucide-react";
 import { useAppContext } from "../AppProvider";
 import Tooltip from "./Tooltip";
+import { Link } from "react-router";
 function SideBar({ shrink }) {
   const Navlinks = [
-    { name: "Dashboard", link: "/dashboard", icon: <LucideHome /> },
-    { name: "Favourites", link: "/settings", icon: <BookMarked /> },
+    { name: "Dashboard", link: "/", icon: <LucideHome /> },
+    { name: "Favourites", link: "/bookmark", icon: <BookMarked /> },
     { name: "Reading History", link: "/profile", icon: <HistoryIcon /> },
   ];
 
@@ -21,7 +22,8 @@ function SideBar({ shrink }) {
       <ul className="w-full flex flex-col gap-4 mt-20 md:mt-0">
         {Navlinks.map((nav, index) => (
           <Tooltip shrink={shrink} text={nav.name} key={index}>
-            <li
+            <Link
+              to={nav.link}
               className={`p-3 flex flex-row items-center border-border bg-secondary ${
                 shrink ? "w-full" : "md:w-[48px]"
               }  border gap-2`}
@@ -36,7 +38,7 @@ function SideBar({ shrink }) {
               >
                 {nav.name}
               </span>
-            </li>
+            </Link>
           </Tooltip>
         ))}
         <li></li>

@@ -1,17 +1,26 @@
 import { Link, useParams } from "react-router";
 // import { useManga } from "../contextApi/useManga";
 import PageRouteName from "../components/PageRouteName";
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useAppContext } from "../AppProvider";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import axios from "axios";
 import { useLocation } from "react-router";
+import { Bookmark } from "lucide-react";
 const apiUrl = import.meta.env.VITE_API_URL;
 function MangaPage() {
   const { id } = useParams();
-  const { allMangaChapter, setAllMangaChapter } = useAppContext();
+  const {
+    allMangaChapter,
+    setAllMangaChapter,
+    bookmarkMangas,
+    handleRemoveManga,
+    handleAddManga,
+  } = useAppContext();
   const [selectedLangauge, setSelectedLangauge] = useState("en");
-  console.log(selectedLangauge);
+  const [clickCount, setClickCount] = useState(0);
+
+  console.log(bookmarkMangas);
   const handleChange = (event) => {
     setSelectedLangauge(event.target.value);
   };
@@ -19,7 +28,8 @@ function MangaPage() {
   const location = useLocation();
   const mangaDetails = location.state.attributes;
   const mangaImage = location.state.image;
-  console.log(location.state);
+  const mangaId = location.state.mangaId;
+  // console.log(location.state);/
 
   // const { manga, isLoadingManga } = useManga(id);
   // console.log({ manga });
@@ -49,10 +59,11 @@ function MangaPage() {
           translatedLanguage: ["en"],
         },
       });
-      console.log(response);
+      // console.log(response);
+      setAllMangaChapter(response.data?.data?.data);
       return response.data?.data?.data || [];
     } catch (error) {
-      throw new Error("Failed to fetch Manga Chapters");
+      throw new Error("Failed to fetch Manga Chapters", error);
     }
   };
 
@@ -83,7 +94,7 @@ function MangaPage() {
     refetchOnWindowFocus: false,
   });
 
-  console.log(mangaChapters);
+  // console.log(mangaChapters);
 
   // if (isPending) {
   //   return (
@@ -126,7 +137,7 @@ function MangaPage() {
   // const tags = manga.attributes.tags;
   return (
     <div className="w-full">
-      {/* <PageRouteName manga={manga} /> */}
+      <PageRouteName manga={mangaDetails} />
       <div className="w-full md:w-fit h-fit xs:h-[300px] overflow-hidden flex gap-1  flex-col xs:flex-row">
         <div className="xs:flex-1 h-[400px] md:flex-0 md:w-[200px]  xs:h-full bg-secondary border-border border  relative overflow-hidden">
           <img
@@ -149,7 +160,25 @@ function MangaPage() {
           </div>
         </div>
       </div>
-      <div className="pt-8 capitalize">
+      <button
+        className="bg-secondary border-border border p-4 m-3"
+        onClick={() => {
+          if (clickCount === 1) {
+            handleRemoveManga(mangaId);
+            setClickCount(0);
+          } else {
+            handleAddManga(mangaId);
+            setClickCount(1);
+          }
+        }}
+      >
+        <Bookmark
+          className="transition-fill duration-75 ease-in"
+          size={30}
+          fill={`${clickCount === 0 ? "" : "white"}`}
+        />
+      </button>
+      <div className="pt-3 capitalize">
         <div className="pb-4 w-full max-w-[1300px] overflow-hidden text-wrap">
           <span className="text-lg md:text-xl">Descriprion:</span>{" "}
           <span className="font-light leading-9 text-text opacity-[0.5] text-base md:text-lg">

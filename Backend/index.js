@@ -5,7 +5,7 @@ import cors from "cors";
 import { Proxy } from "./src/controller/proxy.js";
 import { chapImage, ImageProxy } from "./src/controller/imageProxy.js";
 
-const PORT = 5000;
+const PORT = 5100;
 
 const app = express();
 

@@ -2,12 +2,13 @@ import "./App.css";
 import { SidebarClose } from "lucide-react";
 import SideBar from "./components/SideBar";
 import Dasboard from "./pages/Dasboard";
-import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router";
 import MangaPage from "./pages/MangaPage";
 import Navbar from "./components/Navbar";
 import SearchPage from "./pages/SearchPage";
 import ChapterPage from "./pages/ChapterPage";
+import BookmarkedPage from "./pages/BookmarkedPage";
 
 function App() {
   const [shrink, setShrink] = useState(true);
@@ -34,10 +35,12 @@ function App() {
           >
             <Navbar />
             <div className="py-16 md:py-0 w-full  h-fit " />
+            <ScrollToTop />
             <Routes>
               <Route index element={<Dasboard />} />
               <Route path="/manga/:id" element={<MangaPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/bookmark" element={<BookmarkedPage />} />
               <Route
                 path="/manga/:mangaId/:mangaTitle/chapter/:chapterId"
                 element={<ChapterPage />}
@@ -51,3 +54,13 @@ function App() {
 }
 
 export default App;
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, [pathname]);
+
+  return null;
+};

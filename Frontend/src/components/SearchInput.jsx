@@ -10,6 +10,7 @@ function SearchInput() {
   const { search, setSearch } = useAppContext();
   const [coverArtId, setCoverArtId] = useState(null);
   const [imageSrc, setImageSrc] = useState("");
+  const [previewSearch, setPreviewSearch] = useState(false);
 
   const { searchResult, isLoadingManga, isErrorManga } = useSearchManga(search);
   const coverFileName = useMangaImage(coverArtId);
@@ -20,12 +21,18 @@ function SearchInput() {
     let debounceTimer;
     return function (...args) {
       clearTimeout(debounceTimer);
+
       debounceTimer = setTimeout(() => func(...args), delay);
     };
   };
 
   // Compute derived state directly
   useMemo(() => {
+    if (search === null) {
+      setPreviewSearch(false);
+    } else {
+      setPreviewSearch(true);
+    }
     if (searchResult && searchResult.length > 0) {
       const mangaCoverId = searchResult[0]?.relationships.find(
         (rel) => rel.type === "cover_art"
@@ -38,7 +45,12 @@ function SearchInput() {
         );
       }
     }
-  }, [searchResult, coverFileName]);
+  }, [searchResult, coverFileName, setPreviewSearch, search]);
+
+  const mangaAttributes = {
+    attributes: searchResult !== null ? searchResult[0]?.attributes : null,
+    image: searchResult !== null ? imageSrc : null,
+  };
 
   return (
     <>
@@ -56,7 +68,7 @@ function SearchInput() {
           />
         </div>
         {search !== "" && (
-          <>
+          <div className={`${!previewSearch ? `hidden` : `block`}`}>
             <div className="fixed inset-0 bg-black bg-opacity-50 w-full h-screen -z-10"></div>
             {isErrorManga && (
               <div className="bg-secondary transition-all w-full top-[60px] absolute border-red-500 border h-fit p-3 flex gap-2 flex-col">
@@ -78,23 +90,33 @@ function SearchInput() {
             {searchResult !== null && (
               <div className="bg-secondary transition-all w-full top-[60px] absolute border-border border h-fit p-3 flex gap-2 flex-col">
                 <p className="font-medium capitalize text-lg">result</p>
-                <div className="w-full">
-                  <div
-                    style={{
-                      backgroundImage: `url(${imageSrc})`,
-                    }}
-                    className="bg-cover w-[120px] h-[150px] border border-border"
-                  ></div>
-                </div>
-                <span className="text-sm">
-                  {searchResult[0]?.attributes.title.en}
-                </span>
-                <Link className="capitalize underline" to={"/search"}>
+                <Link
+                  state={mangaAttributes}
+                  to={`manga/${searchResult[0]?.id}`}
+                  onClick={() => setPreviewSearch(false)}
+                >
+                  <div className="w-full">
+                    <div
+                      style={{
+                        backgroundImage: `url(${imageSrc})`,
+                      }}
+                      className="bg-cover w-[120px] h-[150px] border border-border"
+                    ></div>
+                  </div>
+                  <span className="text-sm">
+                    {searchResult[0]?.attributes.title.en}
+                  </span>
+                </Link>
+                <Link
+                  onClick={() => setPreviewSearch(false)}
+                  className="capitalize underline"
+                  to={"/search"}
+                >
                   click here to view all
                 </Link>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </>

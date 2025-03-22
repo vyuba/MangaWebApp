@@ -28,7 +28,7 @@ function Card({ manga }) {
           `${apiUrl}/proxy?url=/chapter/${lastUpadatedId}`
         );
 
-        console.log(response.data);
+        // console.log(response.data);
 
         return {
           chapter: response.data.data.data.attributes.chapter,
@@ -39,7 +39,7 @@ function Card({ manga }) {
         return null;
       }
     },
-    staleTime: 1000,
+    staleTime: Infinity,
     cacheTime: 300000,
     retry: 2,
     refetchOnWindowFocus: false,
@@ -49,30 +49,71 @@ function Card({ manga }) {
 
   const coverFileNAme = useMangaImage(mangaCoverId);
 
-  const imageSrc = `${apiUrl}/image-proxy?url=${mangaId}/${coverFileNAme}`;
+  const {
+    isPending: imageIsPedding,
+    error: imageError,
+    data: image,
+  } = useQuery({
+    queryKey: ["manga Image", mangaId, coverFileNAme],
+    queryFn: async () => {
+      try {
+        if (!coverFileNAme) {
+          return null;
+        }
+        const response = await axios.get(
+          `${apiUrl}/image-proxy?url=${mangaId}/${coverFileNAme}`,
+          {
+            responseType: "arraybuffer",
+          }
+        );
+
+        // Convert binary data to Base64
+        const base64Image = btoa(
+          new Uint8Array(response.data).reduce(
+            (data, byte) => data + String.fromCharCode(byte),
+            ""
+          )
+        );
+
+        // Create data URL
+        const imageSrc = `data:image/jpeg;base64,${base64Image}`;
+
+        return imageSrc;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    },
+    staleTime: Infinity,
+    cacheTime: 3000000,
+    retry: 2,
+    refetchOnWindowFocus: false,
+  });
+
   const mangaAttributes = {
     attributes: manga?.attributes,
-    image: imageSrc,
+    image: image,
+    mangaId,
   };
   // const forEachManga = useManga(mangaId);
 
   return (
-    <Link state={mangaAttributes} to={`manga/${manga?.id}`}>
+    <Link state={mangaAttributes} to={`/manga/${manga?.id}`}>
       <div className="border-border border bg-secondary p-3 flex flex-col gap-3 max-w-full h-full relative">
         <div className="capitalize border-border border bg-background p-2 absolute top-0 right-0 z-10">
           {manga?.attributes?.status}
         </div>
         <div className=" w-full h-[250px] overflow-hidden  relative">
-          {/* {!isImageLoaded ? (
+          {imageIsPedding ? (
             <div className="card-img w-full h-full overflow-hidden bg-cover bg-no-repeat bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader"></div>
-          ) : ( */}
-          <img
-            onLoad={() => setImageIsLoaded(true)}
-            src={imageSrc}
-            className="inset-0 absolute w-full h-full object-cover"
-            alt={data?.title}
-          />
-          {/* )} */}
+          ) : (
+            <img
+              onLoad={() => setImageIsLoaded(true)}
+              src={image}
+              className="inset-0 absolute w-full h-full object-cover"
+              alt={data?.title}
+            />
+          )}
         </div>
         <div className="py-2 flex flex-col gap-2">
           <span className="font-medium">
@@ -80,10 +121,7 @@ function Card({ manga }) {
               <span className="font-light w-full h-3 bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader"></span>
             ) : (
               <p className="capitalize">
-                title:{" "}
-                {data?.title === null
-                  ? "Sorry The Api I Am Using is Crappy they Did not Provide the manga title"
-                  : data?.title}
+                title: {data?.title === null ? mangaTitle : data?.title}
               </p>
             )}
           </span>

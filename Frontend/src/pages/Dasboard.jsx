@@ -18,7 +18,7 @@ function Dasboard() {
           },
         });
 
-        console.log(response.data.data.data[0]);
+        console.log(response.data.data.data);
 
         return response.data.data.data;
       } catch (error) {
@@ -26,7 +26,7 @@ function Dasboard() {
         return null;
       }
     },
-    staleTime: 1000,
+    staleTime: Infinity,
     cacheTime: 300000,
     retry: 2,
     refetchOnWindowFocus: false,
