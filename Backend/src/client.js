@@ -34,7 +34,7 @@ const getAuth = async () => {
   //   console.log("Tokens fetched successfully");
 };
 
-export const mangaService = axios.create({
+const mangaService = axios.create({
   baseURL: "https://api.mangadex.org",
   headers: {
     "User-Agent": "MangaGeek",
@@ -110,3 +110,5 @@ mangaService.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export { mangaService };

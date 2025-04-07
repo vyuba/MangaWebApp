@@ -23,9 +23,12 @@ export const useSearchManga = (title) => {
         setIsLoadingManga(false);
       } catch (error) {
         setIsLoadingManga(false);
-        // console.error("Error fetching manga:", error);
+
+        console.error("Error fetching manga:", error);
         setSearchResult(null);
         setIsErrorManga(true);
+
+        throw new Error(error);
       }
     };
 

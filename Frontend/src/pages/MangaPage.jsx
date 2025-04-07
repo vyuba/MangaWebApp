@@ -1,69 +1,174 @@
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 // import { useManga } from "../contextApi/useManga";
 import PageRouteName from "../components/PageRouteName";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppContext } from "../AppProvider";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { supabase } from "../api/endpoint";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useLocation } from "react-router";
 import { Bookmark } from "lucide-react";
 const apiUrl = import.meta.env.VITE_API_URL;
 function MangaPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const {
-    allMangaChapter,
     setAllMangaChapter,
-    bookmarkMangas,
+    // bookmarkMangas,
     handleRemoveManga,
     handleAddManga,
+    allBookmarkMangaChapter,
+    setAllBookmarkMangaChapter,
+    session,
   } = useAppContext();
   const [selectedLangauge, setSelectedLangauge] = useState("en");
   const [clickCount, setClickCount] = useState(0);
-
-  console.log(bookmarkMangas);
-  const handleChange = (event) => {
-    setSelectedLangauge(event.target.value);
-  };
+  const ref = useRef(null);
 
   const location = useLocation();
-  const mangaDetails = location.state.attributes;
-  const mangaImage = location.state.image;
-  const mangaId = location.state.mangaId;
-  // console.log(location.state);/
+  const mangaDetails = location?.state?.attributes;
+  const mangaImage = location?.state?.image;
+  const mangaId = location?.state?.mangaId;
+  // console.log(location.state);
+
+  const fetchMangaChapter = async (mangaId, offsetParam) => {
+    try {
+      const response = await axios.get(`${apiUrl}/proxy?url=/chapter`, {
+        params: {
+          manga: mangaId,
+          offset: offsetParam || null,
+          translatedLanguage: [selectedLangauge],
+        },
+      });
+
+      return response.data?.data?.data || [];
+    } catch (error) {
+      throw new Error("Failed to fetch Manga Chapters", error);
+    }
+  };
+
+  const {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isChaptersLoading,
+    isError: chaptersError,
+    data: custommangaChapters,
+  } = useInfiniteQuery({
+    queryKey: ["MangaChapter2", id, selectedLangauge],
+    queryFn: async ({ pageParam }) => {
+      const response = await fetchMangaChapter(id, pageParam, selectedLangauge);
+      return { ...response, pageParam };
+    },
+    initialPageParam: 0,
+    staleTime: 1000,
+    cacheTime: 300000,
+    retry: 2,
+    refetchOnWindowFocus: false,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.response?.length === 0) {
+        return undefined; // No more pages to fetch
+      }
+      return lastPage?.pageParam + 10;
+    },
+    getPreviousPageParam: (firstPage) => firstPage,
+    maxPages: location?.lastChapter,
+  });
+
+  // console.log(custommangaChapters);
+
+  useEffect(() => {
+    allBookmarkMangaChapter.forEach((manga) => {
+      if (manga.mangaId === mangaId) {
+        setClickCount(1);
+      }
+    });
+
+    const changes = supabase
+      .channel("favourite-all-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "favouriteManga",
+          filter: `user_id=eq.${session?.user?.id}`,
+        },
+        (payload) => {
+          console.log(payload);
+          setAllBookmarkMangaChapter((prev) => [payload.new, ...prev]);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "favouriteManga",
+          filter: `user_id=eq.${session?.user?.id}`,
+        },
+        (payload) => {
+          console.log(payload);
+        }
+      )
+      .subscribe();
+
+    if (!ref.current) return;
+
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && hasNextPage) {
+          console.log("Fetching next page...");
+          fetchNextPage();
+        }
+      });
+    }, options);
+
+    observer.observe(ref.current);
+
+    return () => {
+      observer.disconnect(), changes.unsubscribe();
+    };
+  }, [
+    fetchNextPage,
+    hasNextPage,
+    setAllBookmarkMangaChapter,
+    allBookmarkMangaChapter,
+    mangaId,
+    session,
+  ]); // Removed `x` as it's unrelated
+
+  // console.log(allBookmarkMangaChapter);
+
+  // console.log(bookmarkMangas);
+  const handleChange = (event) => {
+    setSelectedLangauge(event.target.value);
+    console.log(event.target.value);
+  };
 
   // const { manga, isLoadingManga } = useManga(id);
   // console.log({ manga });
-  const fetchMangaFeed = async (mangaId) => {
+  const fetchMangaFeed = async (mangaId, selectedLangauge) => {
     try {
       const params = {
-        // limit: 0,
+        limit: 500,
         // offset: 100,
-        translatedLanguage: ["en"],
+        translatedLanguage: [selectedLangauge],
       };
       const response = await axios.get(
         `${apiUrl}/proxy?url=/manga/${mangaId}/feed`,
         { params }
       );
-      console.log(response);
+      // console.log(response);
       return response.data?.data?.data || []; // ✅ Return only the data
     } catch (error) {
-      throw new Error("Failed to fetch Manga Feed"); // ✅ Let React Query handle errors
-    }
-  };
-
-  const fetchMangaChapter = async (mangaId) => {
-    try {
-      const response = await axios.get(`${apiUrl}/proxy?url=/chapter`, {
-        params: {
-          manga: mangaId,
-          translatedLanguage: ["en"],
-        },
-      });
-      // console.log(response);
-      setAllMangaChapter(response.data?.data?.data);
-      return response.data?.data?.data || [];
-    } catch (error) {
-      throw new Error("Failed to fetch Manga Chapters", error);
+      throw new Error("Failed to fetch Manga Feed", error); // ✅ Let React Query handle errors
     }
   };
 
@@ -73,70 +178,27 @@ function MangaPage() {
     isLoading: isFeedLoading,
     error: feedError,
   } = useQuery({
-    queryKey: ["MangaFeed", id],
-    queryFn: () => fetchMangaFeed(id),
-    staleTime: 1000,
-    cacheTime: 300000,
-    retry: 2,
-    refetchOnWindowFocus: false,
+    queryKey: ["MangaFeed", id, selectedLangauge],
+    queryFn: () => fetchMangaFeed(id, selectedLangauge),
+    // staleTime: 1000,
+    // cacheTime: 300000,
+    // retry: 2,
+    // refetchOnWindowFocus: false,
   });
 
-  const {
-    data: mangaChapters,
-    isLoading: isChaptersLoading,
-    error: chaptersError,
-  } = useQuery({
-    queryKey: ["MangaChapter", id],
-    queryFn: () => fetchMangaChapter(id),
-    staleTime: 1000,
-    cacheTime: 300000,
-    retry: 2,
-    refetchOnWindowFocus: false,
-  });
+  // console.log(mangaFeed);
 
-  // console.log(mangaChapters);
+  const allChapters =
+    custommangaChapters?.pages
+      .flatMap((page) => Object.values(page))
+      .filter((chapter) => chapter.id) || [];
 
-  // if (isPending) {
-  //   return (
-  //     <>
-  //       <div className="w-full md:w-fit h-fit xs:h-[300px] overflow-hidden flex gap-1  flex-col xs:flex-row">
-  //         <div className="xs:flex-1 h-[400px] md:flex-0 md:w-[200px]  xs:h-full bg-secondary p-2 border-border border  relative overflow-hidden">
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] px-10 searchLoader w-[full] h-full border border-border"></div>
-  //         </div>
-  //         <div className="xs:flex-1 md:flex-0 h-fit xs:h-full bg-secondary border-border border p-2">
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] px-10 searchLoader w-full h-full border border-border"></div>
-  //         </div>
-  //       </div>
-  //       <div className="pt-8 capitalize">
-  //         <div className="pb-4 w-full max-w-[1300px] overflow-hidden text-wrap">
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[120px] h-[20px] border border-border"></div>
-  //           <div className="py-4 flex flex-col gap-3">
-  //             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
-  //             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
-  //             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
-  //             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
-  //           </div>
-  //         </div>
-  //         <div className="flex flex-col gap-3">
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
-  //           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
-  //         </div>
-  //       </div>
-  //     </>
-  //   );
-  // }
-  // const imageUrl = `${apiUrl}/image-proxy?url=${id}/${manga.coverFileName}`;
-  // const mangaChapters = manga.mangaFeed.data.data.data;
-  // setAllMangaChapter(mangaChapters);
-  // console.log(allMangaChapter);
-  // const mangaVolumesArray = Object.entries(manga.mangaDetails.volumes);
-  // // console.log(chaptersArray);
-  // const tags = manga.attributes.tags;
+  if (mangaFeed) {
+    setAllMangaChapter(mangaFeed);
+  }
+
   return (
-    <div className="w-full">
+    <div className="w-full mangapage-ui">
       <PageRouteName manga={mangaDetails} />
       <div className="w-full md:w-fit h-fit xs:h-[300px] overflow-hidden flex gap-1  flex-col xs:flex-row">
         <div className="xs:flex-1 h-[400px] md:flex-0 md:w-[200px]  xs:h-full bg-secondary border-border border  relative overflow-hidden">
@@ -163,8 +225,12 @@ function MangaPage() {
       <button
         className="bg-secondary border-border border p-4 m-3"
         onClick={() => {
+          if (session === null) {
+            navigate("/auth/login");
+            return;
+          }
           if (clickCount === 1) {
-            handleRemoveManga(mangaId);
+            handleRemoveManga(mangaId, session?.user?.id);
             setClickCount(0);
           } else {
             handleAddManga(mangaId);
@@ -184,57 +250,6 @@ function MangaPage() {
           <span className="font-light leading-9 text-text opacity-[0.5] text-base md:text-lg">
             {mangaDetails?.description.en}
           </span>
-          {/* <div className="py-4">
-            <span className="">About author:</span>
-            <div className="flex flex-wrap flex-col gap-2 w-full pt-1">
-              <span>Name: {manga.mangaAuthor.attributes.name}</span>
-              <div className=" text-white flex flex-col gap-2">
-                <span className="">Links :</span>
-                <ul className="flex flex-row flex-wrap gap-3">
-                  <li>
-                    {manga.mangaAuthor.attributes?.twitter ? (
-                      <a
-                        className=""
-                        href={manga.mangaAuthor.attributes?.twitter}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          role="img"
-                          viewBox="0 0 24 24"
-                          className="stroke-white w-5 h-5"
-                        >
-                          <title>X</title>
-                          <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
-                        </svg>
-                      </a>
-                    ) : (
-                      ""
-                    )}
-                  </li>
-                  <li>
-                    {manga.mangaAuthor.attributes?.youtube ? (
-                      <a
-                        className=""
-                        href={manga.mangaAuthor.attributes?.youtube}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="stroke-white w-5 h-5"
-                          role="img"
-                          viewBox="0 0 24 24"
-                        >
-                          <title>YouTube</title>
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                        </svg>
-                      </a>
-                    ) : (
-                      ""
-                    )}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div> */}
           <div>
             <span className="">tags:</span>
             <ul className="flex flex-wrap gap-2 w-full pt-4">
@@ -297,29 +312,109 @@ function MangaPage() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-2 py-4">
-            {mangaChapters
-              .sort((a, b) => a.attributes.chapter - b.attributes.chapter)
-              .map((data, index) => (
+            {allChapters
+              ?.sort((a, b) => a.attributes?.chapter - b.attributes?.chapter)
+              ?.map((data, index) => (
                 <Link
                   className="w-full cursor-pointer bg-secondary p-3 border-border max-w-[500px] border"
                   key={index}
-                  to={`/manga/${id}/${mangaDetails?.title.en}/chapter/${data.id}`}
+                  to={`/dashboard/manga/${id}/${mangaDetails?.title.en}/chapter/${data.id}`}
                 >
                   <span className="">
-                    {data.attributes.chapter}{" "}
-                    {data.attributes.translatedLanguage}
+                    {data?.attributes?.chapter}
+                    {data?.attributes?.translatedLanguage}
                   </span>
                 </Link>
               ))}
+            <div className="" ref={ref}>
+              {isFetchingNextPage
+                ? "Fetching next page"
+                : !hasNextPage
+                ? "Next Page"
+                : "you are all cut up "}
+            </div>
+            E
+          </div>
+        )}
+        {isFetchingNextPage && (
+          <div className="flex flex-col gap-3">
+            <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+            <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+            <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+            <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+            <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+          </div>
+        )}
+        {chaptersError && (
+          <div className="bg-secondary transition-all w-full border-red-500 border h-fit p-3 flex gap-2 flex-col">
+            <p className="font-medium capitalize text-lg">error</p>
+            <span className="capitalize">
+              an error occured please bare with us
+            </span>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+export default MangaPage;
+
 // .filter(
 //   (language) =>
 //     language.attributes.translatedLanguage === selectedLangauge
 // )
+// const {
+//   data: mangaChapters,
+//   isLoading: isChaptersLoading,
+//   isError: chaptersError,
+// } = useQuery({
+//   queryKey: ["MangaChapter", id],
+//   queryFn: () => fetchMangaChapter(id),
+//   staleTime: 1000,
+//   cacheTime: 300000,
+//   retry: 2,
+//   refetchOnWindowFocus: false,
+// });
+// console.log(error);
+// console.log(mangaChapters);
 
-export default MangaPage;
+// if (isPending) {
+//   return (
+//     <>
+//       <div className="w-full md:w-fit h-fit xs:h-[300px] overflow-hidden flex gap-1  flex-col xs:flex-row">
+//         <div className="xs:flex-1 h-[400px] md:flex-0 md:w-[200px]  xs:h-full bg-secondary p-2 border-border border  relative overflow-hidden">
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] px-10 searchLoader w-[full] h-full border border-border"></div>
+//         </div>
+//         <div className="xs:flex-1 md:flex-0 h-fit xs:h-full bg-secondary border-border border p-2">
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] px-10 searchLoader w-full h-full border border-border"></div>
+//         </div>
+//       </div>
+//       <div className="pt-8 capitalize">
+//         <div className="pb-4 w-full max-w-[1300px] overflow-hidden text-wrap">
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[120px] h-[20px] border border-border"></div>
+//           <div className="py-4 flex flex-col gap-3">
+//             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
+//             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
+//             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
+//             <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[220px] h-[20px] border border-border"></div>
+//           </div>
+//         </div>
+//         <div className="flex flex-col gap-3">
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+//           <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-full h-[50px] border border-border"></div>
+//         </div>
+//       </div>
+//     </>
+//   );
+// }
+// const imageUrl = `${apiUrl}/image-proxy?url=${id}/${manga.coverFileName}`;
+// const mangaChapters = manga.mangaFeed.data.data.data;
+// setAllMangaChapter(mangaChapters);
+// console.log(allMangaChapter);
+// const mangaVolumesArray = Object.entries(manga.mangaDetails.volumes);
+// // console.log(chaptersArray);
+// const tags = manga.attributes.tags;

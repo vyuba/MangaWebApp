@@ -5,8 +5,6 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function Dasboard() {
-  // const { fetchMangas } = useMangas();
-
   const { isPending, error, data } = useQuery({
     queryKey: ["All Mangas"],
     queryFn: async () => {
@@ -15,11 +13,9 @@ function Dasboard() {
           params: {
             limit: 50,
             offset: 10,
+            availableTranslatedLanguage: ["en"],
           },
         });
-
-        console.log(response.data.data.data);
-
         return response.data.data.data;
       } catch (error) {
         console.log(error);

@@ -10,8 +10,15 @@ function SearchMangaCard({ manga }) {
   const coverFileNAme = useMangaImage(mangaCoverId);
 
   const imageSrc = `${apiUrl}/image-proxy?url=${manga.id}/${coverFileNAme}`;
+
+  const mangaAttributes = {
+    attributes: manga?.attributes,
+    lastChapter: manga?.chapter,
+    image: imageSrc,
+    mangaId: manga?.id,
+  };
   return (
-    <Link to={`/manga/${manga.id}`}>
+    <Link state={mangaAttributes} to={`/dashboard/manga/${manga.id}`}>
       <div
         key={manga.id}
         className="max-w-[500px]  flex flex-row h-[300px] w-full gap-2"

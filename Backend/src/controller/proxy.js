@@ -12,6 +12,9 @@ export const Proxy = async (req, res) => {
         offset: req.query.offset || 0,
         manga: req.query.manga || undefined,
         translatedLanguage: req.query.translatedLanguage || undefined,
+        originalLanguage: req.query.originalLanguage || undefined,
+        availableTranslatedLanguage:
+          req.query.availableTranslatedLanguage || undefined,
       },
     });
 

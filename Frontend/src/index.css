@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --font-family: "DM Sans", 'inter';
+  --font-family: "DM Sans", "inter";
   font-family: var(--font-family);
-  --primary-color: #03040B;    /* Primary brand color */
-  --secondary-color: #090A15; /* Secondary brand color */
-  --accent-color: #1E2380;     /* Accent or highlight color */
-  --background-color: #03040B; /* Background */
-  --text-color: #C7C6DC;       /* Primary text */
-  --border-color: #101228;     /* Borders */
-  --error-bg-color: #561010;      /* Error or danger */
-  --error-border-color: #B50000;      /* Error or danger */
-  --error-info-color: #D1A1A1;       /* Informational messages */
-  --success-bg-color: #083A0C;    /* Success */
-  --success-border-color: #0F8717;    /* Success */
-  --success-info-color: #C3E3C5;       /* Informational messages */
-  --warning-color: #facc15;    /* Warning */
+  --primary-color: #03040b; /* Primary brand color */
+  --secondary-color: #090a15; /* Secondary brand color */
+  --accent-color: #1e2380; /* Accent or highlight color */
+  --background-color: #03040b; /* Background */
+  --text-color: #c7c6dc; /* Primary text */
+  --border-color: #101228; /* Borders */
+  --error-bg-color: #561010; /* Error or danger */
+  --error-border-color: #b50000; /* Error or danger */
+  --error-info-color: #d1a1a1; /* Informational messages */
+  --success-bg-color: #083a0c; /* Success */
+  --success-border-color: #0f8717; /* Success */
+  --success-info-color: #c3e3c5; /* Informational messages */
+  --warning-color: #facc15; /* Warning */
   /* --text-muted: #6b7280;       Muted text */
 }
 
-.searchLoader{
+.searchLoader {
   animation: gradientAnimation 6s ease infinite;
   background: linear-gradient(90deg, #101228, #181b3d, #383f8e);
   background-size: 300% 300%;
@@ -36,4 +36,27 @@
   100% {
     background-position: 0% 50%;
   }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0px);
+  }
+  25% {
+    transform: translateX(7px);
+  }
+  50% {
+    transform: translateX(-7px);
+  }
+  75% {
+    transform: translateX(7px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.box:hover {
+  cursor: pointer;
+  animation: shake 1s ease-in-out forwards;
 }

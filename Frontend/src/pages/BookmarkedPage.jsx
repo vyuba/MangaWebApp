@@ -1,24 +1,25 @@
 import { useAppContext } from "../AppProvider";
 import { useQueries } from "@tanstack/react-query";
-import emptyBucket from "../assets/emptybucket.svg";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 import Card from "../components/Card";
 import { Heart } from "lucide-react";
 
 function BookmarkedPage() {
-  const { bookmarkMangas } = useAppContext();
-
+  const { bookmarkMangas, allBookmarkMangaChapter } = useAppContext();
   const results = useQueries({
-    queries: bookmarkMangas.map((id) => ({
-      queryKey: ["bookmarked mangas", id],
+    queries: allBookmarkMangaChapter.map((manga) => ({
+      queryKey: ["bookmarked mangas", manga.id],
       queryFn: async () => {
         try {
-          const response = await axios.get(`${apiUrl}/proxy?url=/manga/${id}`, {
-            params: {
-              translatedLanguage: ["en"],
-            },
-          });
+          const response = await axios.get(
+            `${apiUrl}/proxy?url=/manga/${manga.mangaId}`,
+            {
+              params: {
+                translatedLanguage: ["en"],
+              },
+            }
+          );
 
           console.log(response.data.data.data);
           return response.data.data.data;
@@ -52,6 +53,7 @@ function BookmarkedPage() {
       {results?.data.length === 0 ? (
         <div className="w-full h-[calc(100svh-400px)] flex items-center justify-center flex-col pr-24 gap-5">
           <svg
+            className="box"
             xmlns="http://www.w3.org/2000/svg"
             width="214"
             height="219"

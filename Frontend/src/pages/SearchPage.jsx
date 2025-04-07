@@ -37,6 +37,8 @@ function SearchPage() {
           name="search"
           id="search"
           placeholder="Search for manga..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
       <div className="flex flex-col gap-3 pt-4">

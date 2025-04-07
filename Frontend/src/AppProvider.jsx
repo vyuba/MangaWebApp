@@ -1,61 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "./api/endpoint";
 // import { AppContext } from './contextApi/useAppContext';
 
-import { useContext, createContext, useReducer } from "react";
+import { useContext, createContext } from "react";
 
 // Create the Context
 const appCcontext = createContext(null);
 
 // Create a Provider component
 const AppProvider = ({ children }) => {
-  const initialTasks = [];
+  // const initialTasks = [];
   const [search, setSearch] = useState("");
   const [sidebar, setSidebar] = useState(true);
   const [allMangaChapter, setAllMangaChapter] = useState([]);
-  const [bookmarkMangas, dispatch] = useReducer(
-    handleBookmarkManga,
-    initialTasks
-  );
+  const [allBookmarkMangaChapter, setAllBookmarkMangaChapter] = useState([]);
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
 
-  function handleBookmarkManga(state, action) {
-    switch (action.type) {
-      case "ADD_MANGA": {
-        return [...state, action.payload]; // return added state
+  // const navigate = useNavigate();
+  useEffect(() => {
+    const fetchFavouriteManga = async (id) => {
+      const { data, error } = await supabase
+        .from("favouriteManga")
+        .select("*")
+        .eq("user_id", id);
+
+      if (error) {
+        console.error("Error fetching favourite manga:", error);
+      } else {
+        setAllBookmarkMangaChapter(data);
       }
-      case "REMOVE_MANGA": {
-        const updatedBookmark = state.filter((manga) =>
-          console.log(`filter function`, manga !== action.payload)
-        );
-        return updatedBookmark; // return updated state
+    };
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+
+      if (session) {
+        fetchFavouriteManga(session.user.id);
       }
-      default:
-        return state; // return state
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        fetchFavouriteManga(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleAddManga(mangaId) {
+    const { error } = await supabase
+      .from("favouriteManga")
+      .insert({ mangaId, user_id: session?.user.id })
+      .select();
+
+    if (!error) {
+      // dispatch({ type: "ADD_MANGA", payload: mangaId });
+    } else {
+      console.error("Error adding manga:", error);
+    }
+  }
+  async function handleRemoveManga(mangaId, id) {
+    const { error } = await supabase
+      .from("favouriteManga")
+      .delete()
+      .eq("mangaId", mangaId, "user_id", id);
+
+    if (!error) {
+      // dispatch({
+      //   type: "REMOVE_MANGA",
+      //   payload: mangaId,
+      // });
+    } else {
+      console.error("Error deleting manga:", error);
     }
   }
 
-  function handleAddManga(mangaId) {
-    dispatch({
-      type: "ADD_MANGA",
-      payload: mangaId,
-    });
-  }
-  function handleRemoveManga(mangaId) {
-    dispatch({
-      type: "REMOVE_MANGA",
-      payload: mangaId,
-    });
-  }
+  // console.log(session);
 
   return (
     <appCcontext.Provider
       value={{
+        user,
+        setUser,
+        session,
+        setSession,
+        allBookmarkMangaChapter,
+        setAllBookmarkMangaChapter,
         search,
         setSearch,
         sidebar,
         setSidebar,
         allMangaChapter,
         setAllMangaChapter,
-        bookmarkMangas,
+        // bookmarkMangas,
         handleRemoveManga,
         handleAddManga,
       }}

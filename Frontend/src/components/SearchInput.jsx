@@ -54,7 +54,7 @@ function SearchInput() {
 
   return (
     <>
-      <div className="flex flex-1 flex-col gap-2 relative  max-w-[700px]">
+      <div className="flex flex-1 flex-col gap-1 relative  max-w-[700px]">
         <div className="bg-secondary border-border border flex flex-row p-3 gap-2">
           <SearchIcon />
           <input
@@ -68,54 +68,62 @@ function SearchInput() {
           />
         </div>
         {search !== "" && (
-          <div className={`${!previewSearch ? `hidden` : `block`}`}>
-            <div className="fixed inset-0 bg-black bg-opacity-50 w-full h-screen -z-10"></div>
-            {isErrorManga && (
-              <div className="bg-secondary transition-all w-full top-[60px] absolute border-red-500 border h-fit p-3 flex gap-2 flex-col">
-                <p className="font-medium capitalize text-lg">error</p>
-                <span className="capitalize">
-                  an error occured please bare with us
-                </span>
-              </div>
-            )}
-            {isLoadingManga && (
-              <div className="bg-secondary transition-all w-full top-[60px] absolute border-border border h-fit p-3 flex gap-2 flex-col">
-                <p className="font-medium capitalize text-lg">Searching</p>
-                <div className="w-full">
-                  <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[120px] h-[150px] border border-border"></div>
-                </div>
-                <span className="capitalize ">searching</span>
-              </div>
-            )}
-            {searchResult !== null && (
-              <div className="bg-secondary transition-all w-full top-[60px] absolute border-border border h-fit p-3 flex gap-2 flex-col">
-                <p className="font-medium capitalize text-lg">result</p>
-                <Link
-                  state={mangaAttributes}
-                  to={`manga/${searchResult[0]?.id}`}
-                  onClick={() => setPreviewSearch(false)}
-                >
-                  <div className="w-full">
-                    <div
-                      style={{
-                        backgroundImage: `url(${imageSrc})`,
-                      }}
-                      className="bg-cover w-[120px] h-[150px] border border-border"
-                    ></div>
-                  </div>
-                  <span className="text-sm">
-                    {searchResult[0]?.attributes.title.en}
+          <div className={`${!previewSearch ? `` : ``}`}>
+            {/* <div className="fixed inset-0 bg-black bg-opacity-50  w-full h-screen -z-10"></div> */}
+            <div
+              className=""
+              style={{
+                transition: "transform 7000000s ease-in-out",
+                transform: search ? "scale(1) " : "scale(0.2) ",
+              }}
+            >
+              {isErrorManga && (
+                <div className="bg-secondary transition-all w-full top-[20px] absolute border-red-500 border h-fit p-3 flex gap-2 flex-col">
+                  <p className="font-medium capitalize text-lg">error</p>
+                  <span className="capitalize">
+                    an error occured please bare with us
                   </span>
-                </Link>
-                <Link
-                  onClick={() => setPreviewSearch(false)}
-                  className="capitalize underline"
-                  to={"/search"}
-                >
-                  click here to view all
-                </Link>
-              </div>
-            )}
+                </div>
+              )}
+              {isLoadingManga && (
+                <div className="bg-secondary transition-all w-full top-[60px] absolute border-border border h-fit p-3 flex gap-2 flex-col">
+                  <p className="font-medium capitalize text-lg">Searching</p>
+                  <div className="w-full">
+                    <div className="bg-gradient-to-br from-[#101228] via-[#181b3d] to-[#383f8e] searchLoader w-[120px] h-[150px] border border-border"></div>
+                  </div>
+                  <span className="capitalize ">searching</span>
+                </div>
+              )}
+              {searchResult !== null && (
+                <div className="bg-secondary transition-all w-full top-[60px] absolute border-border border h-fit p-3 flex gap-2 flex-col">
+                  <p className="font-medium capitalize text-lg">result</p>
+                  <Link
+                    state={mangaAttributes}
+                    to={`manga/${searchResult[0]?.id}`}
+                    onClick={() => setPreviewSearch(false)}
+                  >
+                    <div className="w-full">
+                      <div
+                        style={{
+                          backgroundImage: `url(${imageSrc})`,
+                        }}
+                        className="bg-cover w-[120px] h-[150px] border border-border"
+                      ></div>
+                    </div>
+                    <span className="text-sm">
+                      {searchResult[0]?.attributes.title.en}
+                    </span>
+                  </Link>
+                  <Link
+                    onClick={() => setPreviewSearch(false)}
+                    className="capitalize underline"
+                    to={"/search"}
+                  >
+                    click here to view all
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

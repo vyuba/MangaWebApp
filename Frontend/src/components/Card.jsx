@@ -28,8 +28,6 @@ function Card({ manga }) {
           `${apiUrl}/proxy?url=/chapter/${lastUpadatedId}`
         );
 
-        // console.log(response.data);
-
         return {
           chapter: response.data.data.data.attributes.chapter,
           title: response.data.data.data.attributes.title,
@@ -92,13 +90,14 @@ function Card({ manga }) {
 
   const mangaAttributes = {
     attributes: manga?.attributes,
+    lastChapter: data?.chapter,
     image: image,
     mangaId,
   };
   // const forEachManga = useManga(mangaId);
 
   return (
-    <Link state={mangaAttributes} to={`/manga/${manga?.id}`}>
+    <Link state={mangaAttributes} to={`/dashboard/manga/${manga?.id}`}>
       <div className="border-border border bg-secondary p-3 flex flex-col gap-3 max-w-full h-full relative">
         <div className="capitalize border-border border bg-background p-2 absolute top-0 right-0 z-10">
           {manga?.attributes?.status}
