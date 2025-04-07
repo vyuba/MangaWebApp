@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { useState } from "react";
 function Navbar() {
   const { sidebar, setSidebar } = useAppContext();
-  const [showSearchBar, setShowSearchBar] = useState(true);
+  const [showSearchBar, setShowSearchBar] = useState(false);
   const handleClick = () => {
     setSidebar(!sidebar);
   };
