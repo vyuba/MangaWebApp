@@ -333,7 +333,6 @@ function MangaPage() {
                 ? "Next Page"
                 : "you are all cut up "}
             </div>
-            E
           </div>
         )}
         {isFetchingNextPage && (
