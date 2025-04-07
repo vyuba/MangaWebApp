@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { CheckCircle2 } from "lucide-react";
 import { supabase } from "../../api/endpoint";
+import { useAppContext } from "../../AppProvider";
 import toast from "react-hot-toast";
 function Register() {
   const [newSignUpDetails, setNewSignUpDetails] = useState({
@@ -12,6 +13,7 @@ function Register() {
     password: "",
   });
 
+  const { setSession } = useAppContext();
   const navigate = useNavigate();
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -20,6 +22,8 @@ function Register() {
         email: newSignUpDetails.email,
         password: newSignUpDetails.password,
       });
+
+      console.log(response);
 
       const { error: insertError } = await supabase.from("users").insert({
         foriegnKey: response?.user?.id,
@@ -32,9 +36,21 @@ function Register() {
         throw new Error("Error storing data", insertError.message);
       }
 
+      toast.success("Login successful", {
+        duration: 4000,
+        position: "top-right",
+        icon: <CheckCircle2 className="text-accent" />,
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      navigate("/dashboard");
+      setSession(response);
       return response;
     } catch (error) {
-      return error;
+      throw new Error("error signing up", error);
     }
   };
 
@@ -46,7 +62,7 @@ function Register() {
     }));
   };
 
-  console.log(newSignUpDetails);
+  //   console.log(newSignUpDetails);
 
   const {
     data,
@@ -62,17 +78,6 @@ function Register() {
     mutationFn: handleSignUp,
     onSuccess: (data) => {
       console.log(data);
-      toast.success("Login successful", {
-        duration: 4000,
-        position: "top-right",
-        icon: <CheckCircle2 className="text-accent" />,
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-      navigate("/auth/login");
     },
   });
   console.log(data);

@@ -8,7 +8,7 @@ import { SidebarClose } from "lucide-react";
 // import { useAppContext } from "../AppProvider";
 
 function DashboardLayout() {
-  const [shrink, setShrink] = useState(true);
+  const [shrink, setShrink] = useState(false);
 
   //   const { session } = useAppContext();
 

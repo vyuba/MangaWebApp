@@ -5,8 +5,8 @@ import SearchInput from "./SearchInput";
 import { Link } from "react-router";
 import { useState } from "react";
 function Navbar() {
-  const { sidebar, setSidebar, session } = useAppContext();
-  const [showSearchBar, setShowSearchBar] = useState(false);
+  const { sidebar, setSidebar } = useAppContext();
+  const [showSearchBar, setShowSearchBar] = useState(true);
   const handleClick = () => {
     setSidebar(!sidebar);
   };
@@ -41,13 +41,6 @@ function Navbar() {
           >
             <SearchInput />
           </div>
-          {session === null && (
-            <Link to="/auth/login">
-              <button className="bg-accent capitalize py-2 px-4 border border-border">
-                login
-              </button>
-            </Link>
-          )}
         </div>
       </div>
     </div>
