@@ -1,6 +1,6 @@
 import "./index.css";
 import Dasboard from "./pages/Dasboard";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import MangaPage from "./pages/MangaPage";
 import SearchPage from "./pages/SearchPage";
 import ChapterPage from "./pages/ChapterPage";
@@ -14,6 +14,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
