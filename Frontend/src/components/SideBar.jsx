@@ -57,9 +57,6 @@ function SideBar({ shrink }) {
         {session !== null ? (
           <>
             <li>
-              <p>vyuba</p>
-            </li>
-            <li>
               <button
                 className="flex capitalize items-center gap-2 border-border bg-accent border w-full p-3"
                 onClick={async () => await supabase.auth.signOut()}

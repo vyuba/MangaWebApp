@@ -51,10 +51,10 @@ const AppProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function handleAddManga(mangaId) {
+  async function handleAddManga(mangaId, id) {
     const { error } = await supabase
       .from("favouriteManga")
-      .insert({ mangaId, user_id: session?.user.id })
+      .insert({ mangaId, user_id: id })
       .select();
 
     if (!error) {

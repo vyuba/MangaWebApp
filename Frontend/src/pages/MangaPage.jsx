@@ -233,7 +233,7 @@ function MangaPage() {
             handleRemoveManga(mangaId, session?.user?.id);
             setClickCount(0);
           } else {
-            handleAddManga(mangaId);
+            handleAddManga(mangaId, session?.user?.id);
             setClickCount(1);
           }
         }}
