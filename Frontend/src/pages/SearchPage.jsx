@@ -1,9 +1,11 @@
 import { SearchIcon } from "lucide-react";
 // import { useMangaTags } from "../contextApi/useMangaTags";
 import { useAppContext } from "../AppProvider";
-import { useSearchManga } from "../contextApi/useSearchManga";
+// import { useSearchManga } from "../contextApi/useSearchManga";
 import { useMangaImage } from "../contextApi/useMangaImage";
 import SearchMangaCard from "../components/SearchMangaCard";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 useMangaImage;
 
 function SearchPage() {
@@ -11,7 +13,26 @@ function SearchPage() {
   // const { mangaTag, isLoadingMangaTags } = useMangaTags();
   //   console.log(mangaTag[0].attributes.name.en);
   // setSearch("attack on titan");
-  const { searchResult, isLoadingManga } = useSearchManga(search);
+  const apiUrl = import.meta.env.VITE_API_URL;
+
+  const { data: searchResult, isLoading: isLoadingManga } = useQuery({
+    queryKey: ["search", search],
+    queryFn: async () => {
+      if (!search) return; // Ensure title is provided before making the request
+      try {
+        const response = await axios.get(`${apiUrl}/proxy?url=/manga`, {
+          params: { title: search },
+        });
+        const resultSearch = response.data.data.data;
+        return resultSearch;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    },
+    retry: 2,
+    refetchOnWindowFocus: false,
+  });
 
   const MangaList = searchResult?.map((manga) => {
     return <SearchMangaCard key={manga.id} manga={manga} />;

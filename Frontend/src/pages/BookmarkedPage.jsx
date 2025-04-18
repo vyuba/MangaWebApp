@@ -6,7 +6,7 @@ import Card from "../components/Card";
 import { Heart } from "lucide-react";
 
 function BookmarkedPage() {
-  const { bookmarkMangas, allBookmarkMangaChapter } = useAppContext();
+  const { allBookmarkMangaChapter } = useAppContext();
   const results = useQueries({
     queries: allBookmarkMangaChapter.map((manga) => ({
       queryKey: ["bookmarked mangas", manga.id],
@@ -28,8 +28,6 @@ function BookmarkedPage() {
           return null;
         }
       },
-
-      staleTime: Infinity,
     })),
     combine: (results) => {
       return {
@@ -38,8 +36,6 @@ function BookmarkedPage() {
       };
     },
   });
-
-  console.log(bookmarkMangas);
   console.log(results);
   return (
     <div>

@@ -122,21 +122,17 @@ function ChapterPage() {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div>
+        loading data ... <SpinnerIcon />{" "}
+      </div>
+    );
+  }
+
   // console.log(allMangaChapter);
   return (
     <div className="chapter-container flex flex-col gap-4 relative h-full">
-      {isLoading
-        ? toast.loading("Loading chapter...", {
-            icon: <SpinnerIcon />,
-            position: "bottom-right",
-            style: {
-              background: "var(--background-color)",
-              color: "var(--text-color)",
-              border: "1px solid var(--border-color)",
-            },
-            id: "loading-Manga-Chapter",
-          })
-        : toast.dismiss("loading-Manga-Chapter")}
       <span className="capitalize text-2xl font-semibold py-4">
         {mangaTitle}
       </span>
@@ -198,7 +194,7 @@ function ChapterPage() {
           </div>
         ))}
       </div>
-      {chapterData?.chapter?.data?.length !== 0 && (
+      {chapterData?.chapter?.data && (
         <div className="w-fulll h-full flex flex-row">
           <button
             disabled={prevChapterIndex === -1}
