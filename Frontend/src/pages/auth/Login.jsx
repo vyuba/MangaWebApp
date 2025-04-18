@@ -93,7 +93,7 @@ function Login() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${apiUrl}/dashboard`,
+          redirectTo: `${apiUrl}/dashboard/`,
         },
       });
 
