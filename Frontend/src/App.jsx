@@ -9,6 +9,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import AuthLayout from "./pages/auth/AuthLayout";
 import DashboardLayout from "./pages/DashboardLayout";
+import Callback from "./pages/auth/Callback";
 function App() {
   return (
     <>
@@ -18,6 +19,7 @@ function App() {
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="callback" element={<Callback />} />
           </Route>
           <Route path="dashboard" element={<DashboardLayout />}>
             <Route index element={<Dasboard />} />

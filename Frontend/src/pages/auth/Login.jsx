@@ -1,13 +1,13 @@
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { CheckCircle2, Link, X } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAppContext } from "../../AppProvider";
 import { useNavigate } from "react-router";
 import { supabase } from "../../api/endpoint";
 import { NavLink } from "react-router";
 function Login() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [newSignUpDetails, setNewSignUpDetails] = useState({
     email: "",
     password: "",
@@ -88,28 +88,30 @@ function Login() {
 
   // console.log(data);
 
- const handleGoogleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
+  const handleGoogleLogin = async (e) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: apiUrl,
+        },
+      });
 
-    if (error) {
-      console.error("OAuth sign-in error:", error);
-      throw new Error(error)
+      if (error) {
+        console.error("OAuth sign-in error:", error);
+        throw new Error(error);
+      }
+
+      // You usually don’t need to do anything else here — Supabase redirects the user.
+
+      console.log(data);
+
+      setSession(data);
+    } catch (err) {
+      toast.error(`Unexpected error: ${err.message || err}`);
+      console.error("Unexpected error during OAuth:", err);
     }
-
-    // You usually don’t need to do anything else here — Supabase redirects the user.
-
-    console.log(data)
-
-    setSession(data)
-  } catch (err) {
-    toast.error(`Unexpected error: ${err.message || err}`);
-    console.error("Unexpected error during OAuth:", err);
-  }
-}
+  };
   return (
     <div className="w-full px-7">
       <img
@@ -117,8 +119,10 @@ function Login() {
         src="../src/assets/MangaGeekLogo.svg"
         alt="mangaGeek logo"
       />
-      <button className="capitalize border-l-[5px] border  border-accent p-3 gap-2 w-full flex items-center justify-center" onClick={(e)=> handleGoogleLogin(e)}
-        >
+      <button
+        className="capitalize border-l-[5px] border  border-accent p-3 gap-2 w-full flex items-center justify-center"
+        onClick={(e) => handleGoogleLogin(e)}
+      >
         <div className="w-6 h-6">
           <svg
             className="fill-border stroke-accent w-full"
