@@ -1,8 +1,10 @@
+import { Toaster } from "react-hot-toast";
 import { Outlet } from "react-router";
 
 function AuthLayout() {
   return (
     <div className="bg-background text-text w-screen h-screen flex ">
+      <Toaster />
       <div className="flex-1 flex items-center justify-center h-full">
         <Outlet />
       </div>

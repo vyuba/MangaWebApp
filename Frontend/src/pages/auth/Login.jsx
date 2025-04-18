@@ -22,6 +22,11 @@ function Login() {
     try {
       const response = await supabase.auth.signInWithPassword(newSignUpDetails);
 
+      if (response.error) {
+        // console.log(response);
+        throw new Error(response.error);
+      }
+
       toast.success("Login successful", {
         position: "top-right",
         icon: <CheckCircle2 className="text-accent" />,
@@ -37,7 +42,7 @@ function Login() {
 
       return response;
     } catch (error) {
-      toast.error("error orcured", {
+      toast.error(error?.message, {
         position: "top-right",
         icon: <X />,
         style: {
@@ -46,7 +51,7 @@ function Login() {
           color: "red",
         },
       });
-      return error;
+      console.error(error?.message);
     }
   };
 
@@ -60,17 +65,7 @@ function Login() {
 
   // console.log(newSignUpDetails);
 
-  const {
-    data,
-    error,
-    failureReason,
-    isError,
-    isIdle,
-    isPaused,
-    isPending,
-    isSuccess,
-    mutateAsync: handleSignUpMutation,
-  } = useMutation({
+  const { isPending, mutateAsync: handleSignUpMutation } = useMutation({
     mutationFn: handleSignUp,
     onSuccess: (data) => {
       console.log(data);
@@ -92,6 +87,29 @@ function Login() {
   // }, [isPending]);
 
   // console.log(data);
+
+ const handleGoogleLogin = async (e) => {
+  e.preventDefault();
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (error) {
+      console.error("OAuth sign-in error:", error);
+      throw new Error(error)
+    }
+
+    // You usually don’t need to do anything else here — Supabase redirects the user.
+
+    console.log(data)
+
+    setSession(data)
+  } catch (err) {
+    toast.error(`Unexpected error: ${err.message || err}`);
+    console.error("Unexpected error during OAuth:", err);
+  }
+}
   return (
     <div className="w-full px-7">
       <img
@@ -99,7 +117,8 @@ function Login() {
         src="../src/assets/MangaGeekLogo.svg"
         alt="mangaGeek logo"
       />
-      <button className="capitalize border-l-[5px] border  border-accent p-3 gap-2 w-full flex items-center justify-center">
+      <button className="capitalize border-l-[5px] border  border-accent p-3 gap-2 w-full flex items-center justify-center" onClick={(e)=> handleGoogleLogin(e)}
+        >
         <div className="w-6 h-6">
           <svg
             className="fill-border stroke-accent w-full"

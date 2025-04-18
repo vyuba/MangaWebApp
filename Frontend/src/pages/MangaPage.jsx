@@ -95,12 +95,12 @@ function MangaPage() {
           filter: `user_id=eq.${session?.user?.id}`,
         },
         (payload) => {
-          console.log(payload);
+          // console.log(payload);
           setAllBookmarkMangaChapter((prev) => [payload.new, ...prev]);
         }
       )
       .on(
-        "postgres_changes",
+        "postgres_changes_delete",
         {
           event: "DELETE",
           schema: "public",
@@ -166,6 +166,7 @@ function MangaPage() {
         { params }
       );
       // console.log(response);
+      setAllMangaChapter(response.data?.data?.data);
       return response.data?.data?.data || []; // ✅ Return only the data
     } catch (error) {
       throw new Error("Failed to fetch Manga Feed", error); // ✅ Let React Query handle errors
@@ -193,9 +194,9 @@ function MangaPage() {
       .flatMap((page) => Object.values(page))
       .filter((chapter) => chapter.id) || [];
 
-  if (mangaFeed) {
-    setAllMangaChapter(mangaFeed);
-  }
+  // if (mangaFeed) {
+  //   setAllMangaChapter(mangaFeed);
+  // }
 
   return (
     <div className="w-full mangapage-ui">

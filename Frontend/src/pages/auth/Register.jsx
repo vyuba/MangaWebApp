@@ -21,20 +21,29 @@ function Register() {
       const response = await supabase.auth.signUp({
         email: newSignUpDetails.email,
         password: newSignUpDetails.password,
+        options: {
+          data: {
+            first_name: newSignUpDetails.username,
+          },
+        },
       });
 
-      console.log(response);
+      console.log(response.error);
 
-      const { error: insertError } = await supabase.from("users").insert({
-        foriegnKey: response?.user?.id,
-        username: newSignUpDetails.username,
-        email: response?.user?.email,
-      });
-
-      if (insertError) {
-        console.error("Error storing data:", insertError);
-        throw new Error("Error storing data", insertError.message);
+      if (response.error) {
+        throw new Error(response.error);
       }
+
+      // const { error: insertError } = await supabase.from("users").insert({
+      //   foriegnKey: response?.user?.id,
+      //   username: newSignUpDetails.username,
+      //   email: response?.user?.email,
+      // });
+
+      // if (insertError) {
+      //   console.error("Error storing data:", insertError);
+      //   throw new Error("Error storing data", insertError.message);
+      // }
 
       toast.success("Login successful", {
         duration: 4000,
@@ -50,7 +59,7 @@ function Register() {
       setSession(response);
       return response;
     } catch (error) {
-      throw new Error("error signing up", error);
+      toast.error(`error logining ${error}`);
     }
   };
 
@@ -66,13 +75,7 @@ function Register() {
 
   const {
     data,
-    error,
-    failureReason,
-    isError,
-    isIdle,
-    isPaused,
     isPending,
-    isSuccess,
     mutateAsync: handleSignUpMutation,
   } = useMutation({
     mutationFn: handleSignUp,

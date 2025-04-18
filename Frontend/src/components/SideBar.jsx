@@ -1,9 +1,4 @@
-import {
-  BookMarked,
-  DoorOpenIcon,
-  HistoryIcon,
-  LucideHome,
-} from "lucide-react";
+import { BookMarked, DoorOpenIcon, LucideHome } from "lucide-react";
 import { useAppContext } from "../AppProvider";
 import { supabase } from "../api/endpoint";
 import Tooltip from "./Tooltip";
@@ -12,15 +7,16 @@ function SideBar({ shrink }) {
   const Navlinks = [
     { name: "Dashboard", link: "/dashboard", icon: <LucideHome /> },
     { name: "Favourites", link: "/dashboard/bookmark", icon: <BookMarked /> },
-    {
-      name: "Reading History",
-      link: "/dashboard/profile",
-      icon: <HistoryIcon />,
-    },
+    // {
+    //   name: "Reading History",
+    //   link: "/dashboard/profile",
+    //   icon: <HistoryIcon />,
+    // },
   ];
 
   const { sidebar, session } = useAppContext();
 
+  // console.log(session.user);
   return (
     <nav
       className={`bg-secondary border-border border    ${
@@ -53,9 +49,11 @@ function SideBar({ shrink }) {
         ))}
       </ul>
 
-      <ul className=" justify-self-end w-full">
+      <ul className=" justify-self-end w-full flex flex-col gap-3">
         {session !== null ? (
           <>
+            <li className="">{session?.user?.user_metadata?.first_name}</li>
+            <li className="">{session?.user?.user_metadata?.email}</li>
             <li>
               <button
                 className="flex capitalize items-center gap-2 border-border bg-accent border w-full p-3"
