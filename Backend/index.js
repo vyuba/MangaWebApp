@@ -9,15 +9,9 @@ import { chapImage, ImageProxy } from "./src/controller/imageProxy.js";
 const PORT = 5100;
 
 const app = express();
-// Replace this with your actual frontend domain
-const allowedOrigin = "https://mangageek.ayuba.me/";
 
-app.use(
-  cors({
-    origin: allowedOrigin,
-    methods: ["GET", "POST"], // or other methods you use
-  })
-);
+app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
