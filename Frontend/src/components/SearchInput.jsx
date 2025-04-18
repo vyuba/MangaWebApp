@@ -117,7 +117,7 @@ function SearchInput() {
                   <Link
                     onClick={() => setPreviewSearch(false)}
                     className="capitalize underline"
-                    to={"/search"}
+                    to={"/dashboard/search"}
                   >
                     click here to view all
                   </Link>
