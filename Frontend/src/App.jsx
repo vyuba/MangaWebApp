@@ -10,10 +10,13 @@ import Register from "./pages/auth/Register";
 import AuthLayout from "./pages/auth/AuthLayout";
 import DashboardLayout from "./pages/DashboardLayout";
 import Callback from "./pages/auth/Callback";
+import ScrollToTop from "./components/ScrollToTop";
+
 function App() {
   return (
     <>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/auth" element={<AuthLayout />}>

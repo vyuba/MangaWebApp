@@ -41,8 +41,8 @@ function DashboardLayout() {
       >
         <Navbar />
         <div className="py-16 md:py-0 w-full  h-fit " />
-        <ScrollToTop />
         <Outlet />
+        <ScrollToTop />
       </div>
       {/* <p>This is the Dashboard Layout</p> */}
     </div>
@@ -52,11 +52,9 @@ function DashboardLayout() {
 export default DashboardLayout;
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
-
   useEffect(() => {
     window.scroll(0, 0);
-  }, [pathname]);
+  }, []);
 
   return null;
 };

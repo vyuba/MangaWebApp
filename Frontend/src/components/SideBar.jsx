@@ -14,7 +14,7 @@ function SideBar({ shrink }) {
     // },
   ];
 
-  const { sidebar, session } = useAppContext();
+  const { sidebar, session, setSidebar } = useAppContext();
 
   // console.log(session.user);
   return (
@@ -23,7 +23,7 @@ function SideBar({ shrink }) {
         sidebar ? `hidden` : `flex`
       } ${
         shrink ? "md:w-auto transition-[width] duration-1000" : "md:w-fit "
-      } fixed md:static inset-0  md:flex  p-3 z-50 transition-[width] duration-1000  flex-col justify-between`}
+      } fixed md:static inset-0  md:flex  p-3 z-50 transition-[width] duration-1000 pt-12 md:pt-0  flex-col justify-between`}
     >
       <ul className="w-full flex flex-col gap-4 mt-20 md:mt-0">
         {Navlinks.map((nav, index) => (
@@ -33,6 +33,7 @@ function SideBar({ shrink }) {
               className={`p-3 flex flex-row items-center border-border bg-secondary ${
                 shrink ? "w-full" : "md:w-auto"
               }  border gap-2`}
+              onClick={() => setSidebar(!sidebar)}
             >
               <span className="h-4 flex items-center justify-center">
                 {nav.icon}
